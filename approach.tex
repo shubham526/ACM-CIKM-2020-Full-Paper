@@ -1,0 +1,116 @@
+\section{Approach}
+\label{sec:Approach}
+Our goal is to enrich entity links with fine-grained aspects of the entities. In this work, we consider whether a static measure of entity salience and relatedness which has not been trained for this task can help. We refer to the entity that we are trying to aspect link as the target entity.
+
+%To study the role of entity salience, entity relatedness and co-occurring entities, we describe below several ranking strategies based on these and later combine them in a learning-to-rank system. In all our discussions, we refer to the entity that we are trying to aspect link as the target entity.
+
+\subsection{Features}
+\label{subsec:Features}
+
+\subsubsection{Entity salience based features}
+\label{subsubsec:Entity salience based features}
+We use SWAT \cite{swat} to find salience of entities in text. Given a text, SWAT returns the entities in the text along with their salience scores.
+\begin{enumerate}
+    \item \textbf{Salience of Entity Mention in aspect (Sal-EM).} Score of the aspect is equal to the salience score of the entity mention in the aspect if the entity is salient, and zero otherwise.
+    
+    \item \textbf{Salient Entities in Context (SEC).} Score an aspect by summing over the salience score of entities $e \in E$, where $E = E_A \cap E_C$, $E_A =$ aspect entities, and $E_C =$ salient entities in sentence, paragraph and section context.
+    
+    %We use the sentence, paragraph and section context around the entity mention to get the set of salient entities $E_C$ in the context using SWAT. We then find the set of entities $E_A$ in the aspect using WAT\cite{piccinno2014wat}. We then find how many entities in the aspect overlap with the salient entities in the context, $E = E_A \cap E_C$. We then score an aspect by summing over the salience score of common entities in $E$. If no overlap is found, the aspect score is zero.
+   %\item \textbf{Salient entities in context.} We use the sentence, paragraph and section context around the entity mention to get the set of salient entities $E_C$ in the context using SWAT. We then find the set of entities $E_A$ in the aspect in two ways: (a) Salient entities using SWAT \cite{swat} \textbf{(SEC-swat)} and (b) All entities using WAT \textbf{(SEC-wat)} \cite{piccinno2014wat}. We then find how many entities in the aspect overlap with the salient entities in the context, $E = E_A \cap E_C$. We then score an aspect by summing over the salience score of common entities in $E$. If no overlap is found, the aspect score is zero. Note, that the context referred to here is the local context of the target entity such as the sentence or paragraph in which the target entity occurs. Later, in Section \ref{subsubsec:Features based on contextual entities}, we use the term contextual entities to refer to other entities which co-occur with the target entity in the entire document collection. The use of the term \textit{contextual} in Section \ref{subsubsec:Features based on contextual entities} should not be confused with the use of the term \textit{context} here.
+    
+    \item \textbf{All Entities in Context (AEC).} 
+    %Same as \ref{subsubsec:Entity salience based features}(2) above, but use both salient and non-salient entities from SWAT for $E_C$.
+    To investigate the extent to which salient entities can affect the performance, we also experiment with using both salient and non-salient entities from SWAT for $E_C$ in \ref{subsubsec:Entity salience based features}(2) above. 
+\end{enumerate}
+
+
+\subsubsection{Entity relatedness based features.} 
+\label{subsubsec:Entity relatedness based features}
+We use WAT \cite{piccinno2014wat} to find relatedness of two entities. Given a list of entities, WAT returns the relatedness between every pair in the list.
+
+
+\textbf{Co-occurring entities with an entity from context.}
+For every entity $e$ in the sentence, paragraph and section context around the target entity $e_T$, we derive a distribution over co-occurring entities $e'$
+with $e$ using the frequency of co-occurrence and the relatedness of co-occurring entities to $e$. We may treat this distribution as the conditional probability distribution $P(e' \vert e)$. To find the co-occurring entities, we use the Entity Context Document (ECD) \cite{chatterjee2019why} for $e$. The ECD is created by first retrieving a candidate set of passages using $e$ as the query and then concatenating all passages which mention $e$.
+%We find the set of all entities $E$ in the sentence, paragraph and section context around the target entity. For every entity $e \in E$, we derive a distribution over the co-occurring entities $e'$ with $e$. This is done using an initial candidate set of passages retrieved using the entity $e$ as the query (using Lucene defualt BM25) from an index of passages from the TREC Complex Answer Retrieval \cite{dietz2018trec} track dataset. Then we concatenate all passages in the candidate set which mention the entity $e$ as in \cite{dalton2014entity,chatterjee2019why}, to get a composite document of all passages mentioning $e$. We call this composite document as an Entity Context Document (ECD) following Chatterjee et al. \cite{chatterjee2019why}. All entities in this ECD are the co-occurring entities with $e$. We then derive a distribution over co-occurring entities with $e$ in two ways: (a) frequency of co-occurrence, and (b) relatedness of each co-occurring entity $e'$ to the entity $e \in E$. We may treat this distribution as the the conditional probability distribution $P(e' \vert e)$, the conditional probability of seeing the co-occurring entity $e'$ provided that we have already seen the target entity $e$. 
+We score an aspect $A$ in following ways.
+
+\begin{enumerate}
+    \item \textbf{Simple Frequency Distribution (SF-Dist).} 
+   % Score an aspect using
+    %\begin{equation}
+    %\label{eq:score-aspect-using-simple-freq-dist}
+    %    \text{Score(A)} = \sum_{e' \in A}P(e' \vert e)
+    %\end{equation}
+    %where $e'$ is an entity in the aspect $A$ which also frequently co-occurs with $e$, $e$ is an entity from the context around the target entity $e_T$, and $P( e' \vert e)$ is the frequency distribution over co-occurring
+entities.
+    
+    We score aspects using frequently co-occurring entities with an entity $e$ from the sentence, paragraph and section context around the target entity, which also occur in the aspect content. Formally,:
+    \begin{equation}
+    \label{eq:score-aspect-using-simple-freq-dist}
+        \text{Score(A)} = \sum_{e' \in A}P(e' \vert e)
+    \end{equation}
+    where $e'$ is an entity in the aspect $A$ which also frequently co-occurs with $e$, $e$ is an entity from the context around the target entity, and $P( e' \vert e)$ is the frequency distribution over co-occurring entities.
+    
+    \item \textbf{Weighted Frequency Distribution (WF-Dist).} 
+    %Same as \ref{subsubsec:Entity relatedness based features}(1) above, but weigh each probability by the relatedness of $e'$ to the target entity $e_T$.
+    
+    Our intuition is that co-occurring entities which are more related to the target entity should contribute more to the final aspect scores. To investigate how relatedness of co-occurring entities affects the aspect scores, we experiment with scoring an aspect $A$ using a weighted sum of frequencies of entities $e'$ in the aspect, weighted by the relatedness of $e'$ to the target entity $e_T$. Formally,
+\begin{equation}
+\label{eq:score-aspect-using-weighted-freq-dist}
+    \text{Score(A)} = \sum_{e' \in A} \text{Relatedness}(e', e_T) \times P(e' \vert e)
+\end{equation}
+where $e'$ is an entity in the aspect $A$ which also frequently co-occurs with $e$, $e_T$ is the target entity, $e$ is an entity from the context around the target entity $e_T$, and $\text{Relatedness}(e', e_T)$ is found using WAT \cite{piccinno2014wat}.
+
+\item \textbf{Relatedness Distribution (Rel-Dist).} 
+Same as \ref{subsubsec:Entity relatedness based features}(1), but use relatedness of $e'$ to $e$ to find $P( e' \vert e)$.
+
+%Same as \ref{subsubsec:Co-occurring entities based features}(1), but we use the relatedness measure between a co-occurring entity $e'$ and an entity $e$ from the context around the target entity to derive the distribution $P( e' \vert e)$.
+\end{enumerate}
+
+\textbf{Co-occurring entities with the target entity.} 
+We use two sources of co-occurring entities with the target entity $e_T$: Entity Context Document (\textbf{ECD}) for $e_T$ and the Wikipedia page (\textbf{Wiki}) of $e_T$. We then score an aspect using the co-occurring entities with $e_T$ in two ways.
+
+    
+\begin{enumerate}
+    \item Use Equation \ref{eq:score-aspect-using-simple-freq-dist} with either frequency distribution \textbf{(SF-Dist-ECD)} or relatedness distribution \textbf{(Rel-Dist-ECD/Rel-Dist-Wiki)} over co-occurring entities to score an aspect.
+        
+    \item Retrieval Score of Aspect (\textbf{RS-Asp}). We treat the target entity $e_T$ as the query and expand the query using top-20 (according to frequency (\textbf{Freq}) and relatedness (\textbf{Rel})) entities from the ECD/Wikipedia page for $e_T$. We then retrieve aspects from an aspect index for $e_T$ (\textbf{RS-Asp-Freq-ECD/RS-Asp-Rel-ECD/RS-Asp-Rel-Wiki}). We experiment with the combinations of the following retrieval models: BM25 (default Lucene), Language Models with Jelinek-Mercer (LMJM) smoothing $(\lambda = 0.4)$, and Language Models with Dirichlet (LMDS) smoothing, and the following expansion models: RM1 and RM3.
+\end{enumerate}
+    
+
+\subsubsection{Lexical and Semantic features}
+\label{subsubsec:Lexical and Semantic features} 
+We re-implemented the lexical and semantic features from Nanni et
+al.\cite{nanni2018entity}. To give a brief recap, Nanni et al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use four methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings and, (4) Entity Embeddings.
+
+\subsubsection{Jordan's Features} 
+
+\cite{pytorch}
+\subsubsection{Neural Network}
+
+
+
+\begin{comment}
+We give a brief overview of the same again for reference. 
+
+Nanni et al.\cite{nanni2018entity} consider three types of aspect representations for finding its similarity to the entity mention in context. 
+
+\textbf{Header.} Rank aspects based on similarity of the mention in context to the header of each section in the Wikipedia page.
+
+\textbf{Content.} Rank aspects based on the similarity between the mention in context and the content of each section of the Wikipedia page of the entity.
+
+\textbf{Entity.} Overlap of entities mentioned in the context of the entity mention and the content of a section on the Wikipedia page of the entity.
+
+They use the following features to rank aspects using the representations above.
+
+\textbf{TF-IDF.} Cosine similarity between the TF-IDF (logarithmic, L2-normalized) vector of contextual mention and aspect.
+
+\textbf{BM25.} Rank aspect representations using the contextual mention as a query using BM25 ($k_1=2, b=0.75)$.
+
+\textbf{Word Embeddings.} Cosine similarity between the mention in context and
+the aspect using pre-trained GloVe \cite{pennington2014glove} embeddings of dimension 300. 
+
+\textbf{Entity Embeddings.} Use 500 dimensional RDF2Vec \cite{ristoski2016rdf2vec} embeddings to embed entities in the context of the entity mention and a section from the Wikipedia page of the entity, then compute
+the document vector using the TF-IDF of an an entity in context of the entity mention and its embedding.
+\end{comment}

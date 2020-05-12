@@ -1,0 +1,35 @@
+\section{Related Work}
+\label{sec:Related Work}
+
+\paragraph{\textbf{Entity Linking.}}
+The task of Entity Linking is to link the mention of an entity in text to a knowledge base entry. Several entity linking systems exist such as TagMe \cite{ferragina2010tagme}, DBPedia Spotlight \cite{mendes2011dbpedia}, Babelfy \cite{babelfy} and WAT \cite{piccinno2014wat}. All these systems examine the context around the entity to disambiguate the entity mention. 
+For example, in the sentence \textit{Steve Jobs founded Apple}, the system would predict from the context that the mention \textit{Apple} refers to the company but in the sentence \textit{The apple fell on Newton's head}, the mention \textit{apple} refers to the fruit. 
+More recently, systems have been developed to produce embeddings of entities from text and knowledge graphs \cite{huang2015leveraging,ristoski2016rdf2vec,yamada2016joint} and for entity disambiguation and linking \cite{yamada2017learning}. 
+
+In this work, we aim to further enrich an entity link with the correct aspect of the entity mention in the text. We treat the sections from the Wikipedia page of the entity mention as different aspects of the entity and given an entity mention along with the sentence, paragraph and section context, try to link it to the correct section (that is, aspect).
+
+\paragraph{\textbf{Entity Aspect Linking using Sections.}} 
+The following works try to map entities or passages to Wikipedia sections, similar to how we want to map an entity to a Wikipedia section.
+Fetahu et al. \cite{fetahu2015automated} enrich Wikipedia sections with news-article references in two steps: First, they suggest news articles to Wikipedia entities (article-entity placement step) and Second, they find the exact section in the entity page where the article must be placed (article-section placement step).
+
+Banerjee et al. \cite{banerjee2015wikikreator} seek to improve Wikipedia stubs by generating content for each section automatically. Their system is based on a text classifier which uses topic distribution vectors to assign content from the web to various sections on a Wikipedia article. This is followed by an abstractive summarization step where section-specific summaries for Wikipedia stubs are generated.
+
+Reinanda et al. \cite{reinanda2016document} present a method for document filtering for long-tail entities, which is based on using aspect-features to identify relevant documents. 
+
+Nanni et al. \cite{nanni2018entity} define each section of the Wikipedia page of the entity as an aspect following \cite{fetahu2015automated,banerjee2015wikikreator,reinanda2016document}.
+In their work, they present a learning-to-rank based method which uses both lexical and semantic features derived from various contexts such as the sentence, paragraph and section where the entity is mentioned in text. They use two types of feature-vectors: (a) Word Vector Models, which consider the symbolic representation of each word as a token using TF-IDF and BM25, and rank aspects using the header, content and entity representations and, (b) Distributional Semantic Models, where each word/entity is represented by its embedding for ranking aspects with header and content representations. They show that using lexical and semantic features with different context sizes improves performance over several established baselines. They also showed the usefulness of their method on three downstream applications.  
+
+
+%They present a learning-to-rank based method which uses both lexical and semantic features derived from various contexts such as the sentence, paragraph and section where the entity is mentioned in text and show that this improves performance over several established baselines. 
+
+In our work, we adopt the same definition of aspects as Nanni  et al. \cite{nanni2018entity} and use their dataset. However, we consider the role of entity salience and relatedness and show that a supervised combination of lexical and semantic features with salience and relatedness features achieves state-of-the-art results.
+
+\paragraph{\textbf{Using Co-occurring Entities}}
+The following works use entities which co-occur with a given entity in two different tasks and show their effectiveness on the task. 
+
+Dalton et al. \cite{dalton2014entity} present the Entity Context Model (ECM) in their work on Entity Query Feature Expansion. They use the ECM to derive a distribution over words in the context of an entity and co-occurring entities with the entity.
+
+Chatterjee et al. \cite{chatterjee2019why} present the Entity Context Document (ECD) in their work in Entity Support Passage Retrieval.For a given query and entity, they try to find a passage which explains to the user, the relationship between the query and the entity. They show that using frequently co-occurring entities with the target entity (the entity about which the support passage needs to be found) is useful in the task.
+
+Following the idea about using co-occurring entities in \cite{dalton2014entity, chatterjee2019why}, we study the effect of using the frequency and relatedness of co-occurring entities on the entity aspect linking task. In particular, we study whether using the frequency of co-occurrence or the relatedness of the co-occurring entities to a given entity is a better indicator of aspects.
+

@@ -1,0 +1,108 @@
+\section{Introduction}
+\label{sec:Introduction}
+
+
+
+
+A journalist is writing an article on the recent Coronavirus Disease 2019 (COVID-19)
+pandemic in which she analyzes the different angles of the pandemic on the economy and worker's safety. COVID-19 has been widely discussed widely in the news, social media, and research commentary. So for a journalist that has to sift through hundreds of thousands of associated texts  which discuss many different aspects of COVID-19 ranging from transmission, pathology, experimental treatment, to food safety, protests, and stay-at-home-orders. The journalist finds it challenging to identify different texts that are relevant for her article without being overwhelmed with other aspects of COVID-19. One relevant text passage is displayed in Figure \ref{fig:introexample}, top. 
+
+
+\input{intro-example}
+
+
+For such support systems, entity linking tools \cite{ferragina2010tagme,mendes2011dbpedia,piccinno2014wat} identify and disambiguate entity mentions, such as of the entity Coronavirus Disease 2019. However the resulting entity links do not differentiate between different aspects of the entity that are being discussed. The journalist in the motivating example would be best helped with a fine-grained extension of entity links---we call this task entity aspect linking. Given a catalog of aspects for each entity, entity aspect linking  additionally extracts which aspect of an entity is referred to in the context. 
+
+ Figure \ref{fig:introexample} lists the most relevant entity aspects for the entities mentioned in the text above.  In this example, a catalog of entity aspects are derived from sections in the Wikipedia article of the mentioned entity, but this is not the only way to define such aspects. 
+
+
+\ld{Deleted Paragraph. I am not a fan of jobs and apple. If you later need an example to explain entity linking you can move it there -- in the introduction I would focus on stuff that's not very well known.}
+% Entity Linking is the task of automatically annotating mentions of entities in text and linking them to their knowledge base entries. Given a sentence such as \textit{Steve Jobs founded Apple}, entity linking tools first aim to identify the entities in the sentence (such as \textit{Steve Jobs} and \textit{Apple}), and then to disambiguate the entity mentions (does the mention \textit{Apple} refer to the fruit or the company?). Finally, they link the mention to its knowledge base entry. For example, the mention \textit{Apple} would be linked to the knowledge base entry for \textit{Apple\_(Company)} and not \textit{Apple\_(Fruit)}.
+
+% Consider a journalist  writing a report on the recent COVID-19 pandemic who wants to analyse the different angles in which it has been mentioned on social media such as the tweet \textit{Several states are seeing outbreaks of \#COVID19 in meat and poultry processing facilities}. To them, identification and disambiguation of the entity \textit{COVID-19} in text may not be enough. They would also want to know the different roles the entity plays. For example, does the mention of COVID-19 in the tweet above refer to its \textit{transmission}, \textit{pathology}, or \textit{experimental treatment}? 
+
+\ld{Merged paragraphs below.}
+% Current entity linking tools \cite{ferragina2010tagme,mendes2011dbpedia,piccinno2014wat} can correctly identify and disambiguate entities in text. However, they cannot infer the correct \textit{aspect} of the entity from the context. For example, given the sentence, \textit{Boris Johnson is back after recovering from COVID-19}, an entity linking tool can correctly disambiguate and link the mention \textit{Boris Johnson} to its knowledge base entry but cannot infer whether the mention refers to his role as a \textit{Writer at the Daily Telegraph} or as the \textit{Prime Minister of the UK}. In general, an entity mention may be related to several different events, roles, and topics. We refer to each of them as an \textit{Entity Aspect}. 
+\paragraph{\textbf{Task.}} Given an entity-mention $E_M$ in a specific context $C$ such a tweet, sentence or paragraph, and a set of $N$ predefined aspects $A_{E_M} = \{A_1, A_2, A_3, \cdots, A_N\}$ along with their contents. Link the mention to an aspect $A_i \in A_{E_M}$ that captures the addressed topic. 
+
+\bigskip
+\ld{I keep on referring to context and content, I think we need a figure for that.}
+
+
+In the following we distinguish between context and content: the context is the text surrounding the entity mention we seek to aspect-link. With content, we refer to content associated with the aspect.
+
+Nanni et al. \cite{nanni2018entity} introduced the entity aspect linking task and suggested a combination of text similarity metrics between mention context and aspect content. One of the similarity metrics includes the overlap and similarity of other entities mentioned in context and aspect content. However, their approach would assign all entities the same importance weight.
+
+We believe the approach can be improved by incorporating the entity saliency, entity relatedness, and joint aspect linking.  
+
+In context and content, only few entities are salient while most other entities are mentioned in passing, such as in examples, circumstantial references, or clarifications. Approaches for entity salience detection have been developed  recently \ld{cite Dunnietz, cite Xiong, cite SWAT}.  \ld{I made this up, can someone confirm:} In an initial analysis we found that that aspect linking suffers from false-positive aspects which are introduced by spurious entity matches. In this work we explore to which extent salience detection can avoid false positives.
+\ld{If we move the salience examples into background, we can say here something like "A detailed introduction to entity saliency is given in Section (Background)".}
+
+
+Several entity relatedness measures have been suggested \cite{ristoski2016rdf2vec} \ld{add citations}. Given two entities, the entity relatedness measures predict which entities are more likely to be similar. Available entity relatedness tools are pre-trained from knowledge graphs and do not take the context of the entity mention into account. Nevertheless, we believe that a static entity-relatedness measure will provide robust background knowledge when integrated with indicators from context and content.
+
+The success of modern entity linking tools lies in the integration of contextual entities and their relations in the prediction process \ld{need citations, eg. Karma paper from Johannes Hoffart and Gerhard Weikum, Lev Ratinov's Wikifier paper, Tagme}. In this paper we incorporate this idea into Entity Aspect Linking: after predicting aspect-links of entities in the context, we use aspect-to-aspect similarity indicators to improve the aspect linking result of a selection entity mention. While knowledge graphs naturally provide relations between entities, this is not the case for catalogs of aspects. Instead we explore similarities based on headings, content, and entities. 
+ 
+Furthermore, we reproduce the implementation of Nanni et al.\ and explore several avenues for improvement.
+
+
+
+
+
+
+\ld{Move some of this to background section?}
+
+
+
+\paragraph{\textbf{Entity Salience.}} 
+Consider the two passages below from two news articles about the entity \textit{Boris Johnson} which address his role as the \textit{Prime Minister of the UK} and his response to the recent COVID-19 pandemic.
+\begin{quote}
+\textbf{Passage 1.} The British government came under heightened pressure to disclose details about a secretive scientific advisory group after a report on Friday that a top political aide to Prime Minister Boris Johnson had taken part in the group’s meetings on the coronavirus pandemic. \footnote{https://www.nytimes.com/2020/04/25/world/europe/uk-dominic-cummings-sage-coronavirus.html}\\
+\textbf{Passage 2.} British Prime Minister Boris Johnson is resisting growing calls to reopen the UK from its lockdown because he is still so “frightened” from his own near-fatal brush with the bug, according to a report \footnote{https://nypost.com/2020/04/21/boris-johnson-too-frightened-to-ease-uk-coronavirus-lockdown/}.
+\end{quote}
+We notice that Passage 2 discusses how the entity \textit{Boris Johnson} in his role as the Prime Minister of the UK is affecting the pandemic situation, whereas Passage 1 just mentions the entity on the side. The entity is central to the discussion in Passage 2 whereas in Passage 1, it is not. We say that \textit{Boris Johnson} is \textit{salient} in Passage 2. Hence, by \textit{salient}, we mean that the entity is \textit{central} to the text in which it is mentioned. 
+
+Consider the following sentence from a new article about \textit{Boris Johnson}.
+
+\begin{quote}
+    Boris Johnson, perhaps the world's most famous coronavirus patient, was back at work Monday — after spending the worst of Britain's epidemic sidelined,
+first in self-isolation, then struggling to breathe in the hospital, and later in recovery in the countryside \footnote{https://www.washingtonpost.com/world/europe/boris-johnson-returns-to-work-after-missing-worst-of-coronavirus-epidemic/2020/04/27/95b590ea-8630-11ea-81a3-9690c9881111_story.html}.
+\end{quote}
+
+In a sentence such as the one above, we would not only prefer to link the mention \textit{Boris Johnson} to the aspect \textit{Prime Minister of the UK}, but also to one whose content is a passage like Passage 2 and not Passage 1. We hypothesize that entity salience is a useful indicator of aspects for entities. We use SWAT \cite{swat}  to find the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages above, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
+
+\paragraph{\textbf{Entity Relatedness. }}
+Entity Relatedness is a measure of how strongly related two entities are. For example, consider the entities, \textit{Boris Johnson}, \textit{Theresa May}, and \textit{Donald Trump}. Intuitively, one would say that \textit{Boris Johnson} is more strongly related to \textit{Theresa May} than to \textit{Donald Trump} because both \textit{Boris Johnson} and \textit{Theresa May} are British politicians and had some role in Brexit. We hypothesize that this measure of entity relatedness can help in aspect linking. More concretely, we hypothesize that an aspect mentioning many related entities to the target entity (the entity we are trying to aspect link), is a good candidate for an aspect for the given target entity. 
+We use the Entity Relatedness system from WAT \cite{piccinno2014wat} to find relatedness between pairs of entities. Given a list of entities, WAT provides the
+relatedness measure between every pair of entities in the list. For example, given the entity list consisting of \textit{Boris Johnson}, \textit{Theresa May} and \textit{Donald Trump}, WAT predicts the relatedness between every pair of entities as follows:
+\begin{quote}
+    (\text{Boris Johnson}, \text{Donald Trump}) = 0.37, \\
+    (\text{Theresa May},\text{Donald Trump})    = 0.38, \\
+    (\text{Boris Johnson}, \text{Theresa May})  = 0.67
+\end{quote}
+
+\paragraph{\textbf{Co-occurring Entities.}}
+Co-occurring entities are entities which co-occur with a given entity in a particular context such as a sentence, passage or article. For example, entities which might co-occur with \textit{Boris Johnson} in a passage may be \textit{Theresa May}, \textit{United Kingdom} and \textit{Brexit}. We study the role of such co-occurring entities on the aspect linking task by comparing whether the frequency or relatedness of these co-occurring entities to the target entity is a better indicator of aspects and under what conditions they work. 
+
+
+\paragraph{\textbf{Joint Entity Aspect Linking.}}
+
+\ld{Jordan: here we describe your addition}
+
+%Nanni et al. \cite{nanni2018entity} have shown that a supervised combination of various text and entity features based on embeddings of the words and entities from various sources (context of mention, content of Wikipedia page of the mention, etc) is able to correctly predict aspects in 70\% of the cases. In this work, we build on their work and use entity salience and relatedness based features in supervised setting with some lexical and semantic features used in \cite{nanni2018entity} and show that this leads to significant improvements in results on the task.
+
+\paragraph{\textbf{Contributions.}} 
+
+%This paper studies the role of entity salience and relatedness on the aspect linking task. We study how these indicators can help and under what conditions they work. We show that using these indicators alone may not be useful but a supervised combination of salience and relatedness based features along with some lexical and semantic features outperforms the current state-of-the-art on the task. We also study the effect of using the frequency and relatedness 
+%contextual entities on the task.
+
+Our contributions are as follows.
+\begin{enumerate}
+
+    \item We study the effect of using entity salience, entity relatedness and co-occurring entities on the task.
+    \item We show that although entity salience and entity relatedness can work on their own, a supervised combination of these indicators along with some lexical and semantic features can outperform several baselines and the current state-of-the-art on the task to achieve better results.
+    \item \ld{Jordan: add}
+    \item We present a detailed study and analysis of the conditions under which these indicators work versus do not work. 
+\end{enumerate}
+
+\paragraph{\textbf{Outline.}} The remainder of this paper is organized as follows. Section \ref{sec:Related Work} discusses some related work on the topic. Section \ref{sec:Approach} presents our proposed method in detail. Section \ref{jordan-logistic} introduces the logistic model used in predicting aspect relevance, while Section \ref{jordan-lstm} uses a Bi-LSTM model to predict aspects embedded using ELMo. In Section \ref{jordan-co-entity}, we motivate the use of co-occuring entities in predicting the relevant of aspects in a joint learning model.  Section \ref{sec:Evaluation} presents a quantitative evaluation of our work. Finally, we conclude the paper with Section \ref{sec:Conclusion}.
