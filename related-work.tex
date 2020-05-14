@@ -1,3 +1,9 @@
+ %activate todo's
+\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1!}}
+% deactivate todos
+%\newcommand{\todo}[1]{ \PackageWarning{TODO:}{#1!}}
+
+
 \section{Related Work}
 \label{sec:Related Work}
 
@@ -8,8 +14,16 @@ More recently, systems have been developed to produce embeddings of entities fro
 
 In this work, we aim to further enrich an entity link with the correct aspect of the entity mention in the text. We treat the sections from the Wikipedia page of the entity mention as different aspects of the entity and given an entity mention along with the sentence, paragraph and section context, try to link it to the correct section (that is, aspect).
 
+% zeng2019measuring : Measuring Entity Relatedness via Entity and Text Joint Embedding : Really well written
+% durrett2014joint : A joint model for entity analysis: Coreference, typing, and linking
+% zhao2019leveraging : Leveraging Context Information for Joint Entity and Relation Linking
+% nguyen2016joint : Joint learning of local and global features for entity linking via neural networks
+% le2018improving : Improving entity linking by modeling latent relations between mentions
+\paragraph{\textbf{Joint Entity Linking.}} In this paper, we consider the use of contextual information from co-occuring entities to aid in linking aspects. This concept is very similar to the disambiguation of an entity mention by using the context of surrounding entity links. Zhao et al. \cite{zhao2019leveraging}
+
 \paragraph{\textbf{Entity Aspect Linking using Sections.}} 
 The following works try to map entities or passages to Wikipedia sections, similar to how we want to map an entity to a Wikipedia section.
+
 Fetahu et al. \cite{fetahu2015automated} enrich Wikipedia sections with news-article references in two steps: First, they suggest news articles to Wikipedia entities (article-entity placement step) and Second, they find the exact section in the entity page where the article must be placed (article-section placement step).
 
 Banerjee et al. \cite{banerjee2015wikikreator} seek to improve Wikipedia stubs by generating content for each section automatically. Their system is based on a text classifier which uses topic distribution vectors to assign content from the web to various sections on a Wikipedia article. This is followed by an abstractive summarization step where section-specific summaries for Wikipedia stubs are generated.
@@ -31,5 +45,5 @@ Dalton et al. \cite{dalton2014entity} present the Entity Context Model (ECM) in 
 
 Chatterjee et al. \cite{chatterjee2019why} present the Entity Context Document (ECD) in their work in Entity Support Passage Retrieval.For a given query and entity, they try to find a passage which explains to the user, the relationship between the query and the entity. They show that using frequently co-occurring entities with the target entity (the entity about which the support passage needs to be found) is useful in the task.
 
-Following the idea about using co-occurring entities in \cite{dalton2014entity, chatterjee2019why}, we study the effect of using the frequency and relatedness of co-occurring entities on the entity aspect linking task. In particular, we study whether using the frequency of co-occurrence or the relatedness of the co-occurring entities to a given entity is a better indicator of aspects.
+Following the idea about using co-occurring entities in \cite{dalton2014entity, chatterjee2019why}, we study the effect of using the frequency and relatedness of co-occurring entities on the entity aspect linking task. In particular, we study whether using the frequency of co-occurrence or the relatedness of the co-occurring entities to a given entity is a better indicator of aspects. \todo{Jordan: You are using co-occurring entities too. Add some text here about how you are using them}
 
