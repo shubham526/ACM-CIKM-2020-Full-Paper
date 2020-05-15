@@ -28,94 +28,99 @@
 \acmDOI{10.1145/1122445.1122456}
 \acmISBN{978-1-4503-9999-9/18/06}
 
-%
-% These commands are for a JOURNAL article.
-%\setcopyright{acmcopyright}
-%\acmJournal{TOG}
-%\acmYear{2018}\acmVolume{37}\acmNumber{4}\acmArticle{111}\acmMonth{8}
-%\acmDOI{10.1145/1122445.1122456}
 
-%
-% Submission ID. 
-% Use this when submitting an article to a sponsored event. You'll receive a unique submission ID from the organizers
-% of the event, and this ID should be used as the parameter to this command.
-%\acmSubmissionID{123-A56-BU3}
-
-%
-% The majority of ACM publications use numbered citations and references. If you are preparing content for an event
-% sponsored by ACM SIGGRAPH, you must use the "author year" style of citations and references. Uncommenting
-% the next command will enable that style.
-%\citestyle{acmauthoryear}
-
-%
-% end of the preamble, start of the body of the document source.
 \begin{document}
 
-\section{Neural Methods}
+\section{Background}
 
-\subsection{Logistic Network}\label{jordan-logistic}
-We first implement a layer logistic network, using the PyTorch library \cite{pytorch}, and the following features from \cite{nanni2018entity}:
-
-% \begin{itemize}
-%     \item Passage-header-bm25
-%     \item Passage-content-bm25
-%     \item Passage-content-overlap
-%     \item Passage-
-% \end{itemize}
-
-We train on 88,000 examples pulled from the 2018 Wikipedia dump. 
-We use minibatching, batches of 500, and cross entropy as the loss function.
-
-\subsection{ELMo Bi-LSTM}\label{jordan-lstm}
-Another feature we use is a Bi-LSTM neural network model for predicting the relevance of an aspect.
-We embed the paragraph context of the mention, and the text content of each aspect, by using ELMo vectors \cite{elmo}.
-ELMo allows us to embed each individual sentence  --
 
 \subsection{Co-Entity Context}\label{jordan-co-entity}
 One valuable source of context for which we can use to link an aspect to an entity mention, is that entities can be mentioned together in the same paragraph.
 We can use this context to further evaluate the relevance of aspects, given how much they have in common with the aspects of entities that co-occur in the same passage. 
 
 For example, the Chocolate Wikipedia page contains many sections that cover a broad array of subtopics. One of these sections is the ``Health Benefits of Chocolate'', which is notably smaller than the other sections in comparison. The section contains very specific medical terms that may not occur in a sentence where this section would be the correct aspect to link to. As an example, consider a sentence like ``Make sure that you keep away chocolate from your dogs.''. There is no indication that this has anything to do with health, but if we first linked the aspect of dogs, we would see that the ``Health'' section explicitly mentions the danger of poisoning from chocolate. Using this context, it then becomes clear what the relevant section is in Chocolate: not the section that mentions chocolate the most, but the one that talks about Theobromine poisoning and side effects.
-While the mentioned entity in the paragraph context is used to directly link to an aspect section on that entity's page, we can also use the other entities that co-occur with this mention in the same paragraph. By performing aspect linking on these other entities, we can use the resulting aspects, and their content, to develop a model for determining the relevance of the primary mention's aspect.
 
-% To achieve this, we first link co-occuring entities with their most relevant aspects.
-% We determine the relevance of the aspects given the Logistic Network outlined previously \ref{jordan-logistic}.
-% Each linked aspect contains the text, header, and entity mentions associated with that section.
-% To score the aspects of the primary mention, we try the following approaches:
-In the following sections, we define \textit{co-entities} as the entities that co-occur with the mentioned entity that we are trying to link.
-Each co-entity contains a set of aspects which are Wikipedia sections. 
-We refer to these aspects as co-aspects, as they are not the primary aspects we are trying to determine the relevance of for a given mention.
+\textbf{Aspect Relevance.} Our task requires that we choose the aspect that best explains the context of an entity mention. We use a measure of relevance to represent the likelihood that an entity aspect should be linked to an entity given a mention and its surrounding context.
 
-\subsubsection{Distributional Model}
-To construct an inference model that depends on the context of co-occuring entities, we consider the following measures:
+\textbf{Co-Entity Similarity}. It is not always the case that we can use the context of co-entities to infer the context of an entity mention. For example, a very large paragraph can contain many co-entities that are spaced far apart. We would expect distance entities to share little context in common.
+We use measures of similarity between co-entities and entities to determine how much context they share in common.
 
-\textbf{Aspect Link Likelihood.} Our task requires that we choose the aspect that best explains the context of an entity mention. We use a measure of relevance to represent the likelihood that an aspect should be linked to an entity given a mention. As described in section \ref{jordan-logistic}, we use a logistic network for this purpose. 
+\textbf{Co-Aspect Similarity.}. One drawback of the Co-Entity similarity measure is that it is more of a global measure of contextual similarity. Consider the ``Chocolate'' example in section \ref{jordan-disambig}. Dogs and chocolates are not very related to each other, although we saw a context in which these two entities were related to each other, and that's the fact that chocolate is poisonous to dogs. Both entities have a section discussing this fact, but these sections are far smaller than the other sections in these entities by comparison. In the case of a global measure of inference, we would expect there to be a very weak correlation between chocolate and dogs, as they possess few overlapping topics. If we instead looked at the individual sections in each page, we would see that the ``Health'' section in ``Dog'' frequently mentions the dangers of chocolate and theobromine poisoning. 
 
-\textbf{Co-Entity Inference Likelihood}. The presence of co-entities in a paragraph does not necessarily indicate that they are a valuable source of information. For example, a very large paragraph can contain many co-entities, and not all of the co-entities will be contextually related to our entity of interest. Therefore we seek to derive a measure of inference that predicts the likelihood that a co-entity shares the same context as an entity. This determines how much we can infer the relevance of an aspect given information about an entity (such as the entity's title, page links, its co-aspects, etc.).
-
-\textbf{Co-Aspect Inference Likelihood}. One drawback of a Co-Entity Inference Likelihood measure is that it is more of a global measure of contextual similarity. Consider the ``Chocolate'' example in section \ref{jordan-disambig}. Dogs and chocolates are not very related to each other, although we saw a context in which these two entities were related to each other, and that's the fact that chocolate is poisonous to dogs. Both entities have a section discussing this fact, but these sections are far smaller than the other sections in these entities by comparison. In the case of a global measure of inference, we would expect there to be a very weak correlation between chocolate and dogs, as they possess few overlapping topics. If we instead looked at the individual sections in each page, we would see that the ``Health'' section in ``Dog'' frequently mentions the dangers of chocolate and theobromine poisoning. 
-
-Given these measures, we propose the following statistical model:
-
-The 
-
-We construct a set of conditional distributions from co-aspects to aspects.
-These distributions represent how relevant each aspect is, given the relevance of a set of co-aspects.
-We obtain the relevance of of each aspect by marginalizing the relevance score of each co-aspect over the set of aspects given a conditional distribution.
-The goal is then to determine the best combination of conditional distributions that predicts the relevance of aspects given co-aspects.
-We represent the set of conditional distributions as a neural network, which call a conditional network.
-
-We investigate the performance of several methods for combining the outputs of these networks:
-
-\textbf{Fixed Logistic Network.} We first train the logistic network and fix its parameters before training the conditional network. We then score the relevance each co-aspect, given a co-mention, using the logistic network. These scores become the input layer for the conditional network, while the output layer of the conditional network represents the scores of the primary aspects, given the initial scores  is a marginalization over the conditional distributions between aspects and co-aspects. We then train the conditional network such that it best predicts the relevance of aspects give fixed output of the logistic network. While this can be considerably faster than other methods, it makes the assumption that the optimal parameters for the logistic network are independent of those of the conditional network.
-
-\textbf{Joint Training.} We jointly train the logistic network and the conditional network using expectation maximization.
+\section{Approach}
 
 
-\textbf{Pseudorelevance Feedback.} In this example, we model the relevance of aspects by marginalizing over words.
+\subsection{Entity Aspect Representation}\label{jordan-vector}
+In this paper we represent entity aspects in two ways.
+The first way is through the use of features which measure the relevance of an entity aspect with respect to the paragraph context of an entity mention. We use the following following aspect relevance features:
+
+\textbf{bm25-\{sentence / paragraph\}-to-text}. We use the BM25 to compare an entity aspect's main body of text to the sentence, or paragraph, that contains the entity mention. 
+
+\textbf{bm25-\{sentence / paragraph\}-to-header}. We use the BM25 to compare an entity aspect's section header to the sentence, or paragraph, that contains the entity mention. 
 
 
+\textbf{entity-overlap-\{sentence / paragraph\}}. We count the number of distinct entity overlaps between an entity aspect and the entities contained in the sentence, or paragraph, that contains the entity mention.
 
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{references}
+\textbf{word2vec-\{sentence / paragraph\}-cosine}. We use the Word2Vec embedding to measure the cosine similarity between the text of an entity aspect, and the text of the sentence, or paragraph, that contains the entity mention.
+
+\textbf{aspect-size}. This length of an entity aspect text in words.
+
+... 
+
+(\textit{actually maybe I should just cite Fede's features and say I used those})
+
+...
+
+The second way in which we represent entity aspects is through embeddings using ELMo \cite{elmo}.
+ELMO's is a contextual language embedding model that takes as input a sentence, and outputs word embeddings that depend upon the context given by the sentence. Each word embedding consists of three vectors, and in this paper we concatenate these vectors together to obtain a final word embedding. We then average all of the word embeddings in a sentence together to obtain the embedding of a sentence. These embeddings are used as sequential inputs in a BiLSTM. We embed both the paragraph context of an entity's mention, and the text of each candidate entity aspect. (number of hidden layers to be determined ...)
+
+\subsection{Neural Methods.}
+We use the PyTorch library \cite{pytorch} to construct our neural networks. There are three neural networks that we consider both independently, and together in a joint model. 
+
+\subsection{Logistic Network}
+
+The logistic network consists of an input layer, which takes the entity aspect ``bag of words'' vectors as an input, a single linear layer, and an output layer that represents the likelihood that the entity aspect is the correct aspect to link to a given entity mention. There are three separate versions of this network that we utilize throughout this paper. 
+
+
+\subsection{BiLSTM Network}
+ The sentence embeddings of both the entity aspects, and the paragraph context in which an entity mention is located, are used as inputs into two separate BiLSTM layers. The outputs of the BiLSTMs are concatenated and a final linear transformation is used to obtain a scalar value that also represents the likelihood of an entity aspect being the correct aspect to link to a given mention.
+ 
+...
+ 
+ (T.B.D. if BiLSTM approach works with new dataset; may drop if numbers aren't good)
+ 
+ \subsection{Global Context Network}
+The global context network utilizes entities that co-occur within the same text as the primary entity mentions. We do not possess a ground truth for the majority of these co-occuring entities because most links in Wikipedia do not link to a section in a page. However, these co-occuring entities are still useful in determining the likelihood that a primary entity aspect aspect should be linked. 
+We accomplish this by scoring each pair of co-occuring entity aspect and primary entity aspect with respect to a set of aspect-to-aspect similarity functions. Each similarity function therefore generates an I by J by K matrix, where I is the number of co-occuring entities, J is the number of co-occuring entity aspects which is padded to maintain a size of 20, and K is the number of primary entity aspects. We use the following aspect-to-aspect similarity functions:
+
+\textbf{Unigram Overlap.} The number of unigrams that overlap based on the text contained in each entity aspect.
+
+
+\textbf{Character n-gram Overlap.} We use a sliding window to generate character 4-grams from each entity aspect text, and the similarity between to entity aspects is respect to the overlap of these 4-grams.
+
+\textbf{Header Overlap.}
+We also use the Character n-gram Overlap method with respect to the section header of each entity aspect.
+
+\textbf{Entity Overlap.}
+Each entity aspect also contains a number of entity links within the main body of its text. We count the overlap of these entities with respect to two entity aspects.
+
+\textbf{Word2Vec Cosine Similarity.} 
+We embed the text of each entity aspect by using Word2Vec to generate word embeddings, and then we average these embeddings together. We measure the cosine similarity between two entities with respect to these embeddings.
+
+We then score the relevance of an entity aspect using a weighted combination of these aspect-to-aspect similarity features.  
+Let $a^{'}$ be an entity aspect, $E$ be the collection of co-entities for a given paragraph context, $A_i$ be the set of co-entity aspects with respect to a given co-entity, $e_i$, $S$ be the collection of aspect-to-aspect similarity features, and $\lambda_j$ be a weight for aspect-to-aspect similarity feature $\lambda_j$. Finally, we also utilize a logistic layer to represent the relevance of a co-aspect with respect to a co-entity, given by the function $\text{rel}(e_i, a_j)$. 
+
+\begin{equation}
+\text{global}(a^{'}) = \sum_{e_i  \in E}\sum_{a_j \in A_i}\sum_{\text{sim}_k \in S} \text{rel}(e_i, a_j) \cdot \text{sim}_k(a^{'}, a_j) \cdot \lambda_j
+\end{equation}
+
+\subsection{Joint Learning}
+...(T.B.D. on what works; two different approaches)
+
+
+\section{Evaluation}
+We evaluate the Logistic Network, BiLSTM network, and Global Context Separately, as well as together with respect to joint optimization. We train each model with respect to binary cross entropy, using the Adam optimizer from the PyTorch library. We use samples from the 88k dataset, and then evaluate with respect to the samples in Nanni et al.'s dataset. We report P@1 and MAP statistics for each method. The \textbf{just-logistic, just-bi,} and \textbf{just-global} methods are with respect to evaluation using only the logistic network, BiLSTM network, and global context network respectively. The \textbf{joint-network} method consists of all three networks, the parameters of which are trained simultaneously.
+
+% \bibliographystyle{ACM-Reference-Format}
+% \bibliography{references}
 \end{document}

@@ -44,3 +44,18 @@ The aspect above may be linked to the entity \textit{Boris Johnson} since it men
 \subsection{Co-occurring Entities}
 \label{subsec:Co-occurring Entities}
 Co-occurring entities are entities which co-occur with a given entity in a particular context such as a sentence, passage or article. For example, entities which might co-occur with \textit{Boris Johnson} in a passage may be \textit{Theresa May}, \textit{United Kingdom} and \textit{Brexit}. We study the role of such co-occurring entities on the aspect linking task by comparing whether the frequency or relatedness of these co-occurring entities to the target entity is a better indicator of aspects and under what conditions they work. 
+
+\ld{Jordan's stuff...}
+\subsection{Joint Aspect Linking}\label{jordan-co-entity}
+One valuable source of context for which we can use to link an aspect to an entity mention, is that entities can be mentioned together in the same paragraph.
+We can use this context to further evaluate the relevance of aspects, given how much they have in common with the aspects of entities that co-occur in the same passage. 
+
+For example, the Chocolate Wikipedia page contains many sections that cover a broad array of subtopics. One of these sections is the ``Health Benefits of Chocolate'', which is notably smaller than the other sections in comparison. The section contains very specific medical terms that may not occur in a sentence where this section would be the correct aspect to link to. As an example, consider a sentence like ``Make sure that you keep away chocolate from your dogs.''. There is no indication that this has anything to do with health, but if we first linked the aspect of dogs, we would see that the ``Health'' section explicitly mentions the danger of poisoning from chocolate. Using this context, it then becomes clear what the relevant section is in Chocolate: not the section that mentions chocolate the most, but the one that talks about Theobromine poisoning and side effects.
+
+\textbf{Aspect Relevance.} Our task requires that we choose the aspect that best explains the context of an entity mention. We use a measure of relevance to represent the likelihood that an entity aspect should be linked to an entity given a mention and its surrounding context.
+
+\textbf{Co-Entity Similarity}. It is not always the case that we can use the context of co-entities to infer the context of an entity mention. For example, a very large paragraph can contain many co-entities that are spaced far apart. We would expect distance entities to share little context in common.
+We use measures of similarity between co-entities and entities to determine how much context they share in common.
+
+\textbf{Co-Aspect Similarity.}. One drawback of the Co-Entity similarity measure is that it is more of a global measure of contextual similarity. Consider the ``Chocolate'' example in section \ref{jordan-disambig}. Dogs and chocolates are not very related to each other, although we saw a context in which these two entities were related to each other, and that's the fact that chocolate is poisonous to dogs. Both entities have a section discussing this fact, but these sections are far smaller than the other sections in these entities by comparison. In the case of a global measure of inference, we would expect there to be a very weak correlation between chocolate and dogs, as they possess few overlapping topics. If we instead looked at the individual sections in each page, we would see that the ``Health'' section in ``Dog'' frequently mentions the dangers of chocolate and theobromine poisoning. 
+\ld{End of Jordan's stuff...}
