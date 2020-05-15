@@ -1,61 +1,27 @@
 \section{Background}
 \label{sec:Background}
 
-%\ld{I still need to clean this up.... Maybe some of the examples could be useful in Approach.}
+We re-implemented the lexical and semantic features from Nanni et
+al.\cite{nanni2018entity}. To give a brief recap, Nanni et al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use four methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings and, (4) Entity Embeddings. \todo{Jordan: This should be merged with the text below in this section.}
+
+\label{entity-aspect-representation}
+
+%\ld{Todo: rewrite in third person (no "we", and now mention of what we will be doing here, this is strictly Fede's work, no ours). Here we only explain the part of Fede's work that we recycle.}
+
+%\ld{Todo We don't have to explain things we did not use, but it might be helpful to say that he also used RDF2Vec, which we will replace with a different entity relatedness measure.}
 
 
-%\paragraph{\textbf{Entity Salience.}} 
-\subsection{Entity Salience}
-\label{subsec:Entity Salience}
-Consider the two passages in Figure \ref{fig:Salience} from two news articles about the entity \textit{Boris Johnson} which address his role as the \textit{Prime Minister of the UK} and his response to the recent COVID-19 pandemic.
-\begin{figure}[t]
-    \centering
-   \begin{quote}
-\textbf{Passage 1.} The British government came under heightened pressure to disclose details about a secretive scientific advisory group after a report on Friday that a top political aide to Prime Minister Boris Johnson had taken part in the group’s meetings on the coronavirus pandemic. \\
-\textbf{Passage 2.} British Prime Minister Boris Johnson is resisting growing calls to reopen the UK from its lockdown because he is still so “frightened” from his own near-fatal brush with the bug, according to a report .
-\end{quote}
-    \caption{Salient versus Non-Salient Passage. Passage 2 is salient for entity \textit{Boris Johnson} whereas Passage 1 is not.}
-    \label{fig:Salience}
-\end{figure}
-We notice that Passage 2 \footnote{https://nypost.com/2020/04/21/boris-johnson-too-frightened-to-ease-uk-coronavirus-lockdown/} in Figure \ref{fig:Salience} discusses how the entity \textit{Boris Johnson} in his role as the Prime Minister of the UK is affecting the pandemic situation, whereas Passage 1 \footnote{https://www.nytimes.com/2020/04/25/world/europe/uk-dominic-cummings-sage-coronavirus.html} just mentions the entity on the side. The entity is central to the discussion in Passage 2 whereas in Passage 1, it is not. We say that \textit{Boris Johnson} is \textit{salient} in Passage 2. Hence, by \textit{salient}, we mean that the entity is \textit{central} to the text in which it is mentioned. 
+Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model to represent entity aspects. We implement the following features from the authors' paper:
 
-Consider the following sentence from a new article about \textit{Boris Johnson}.
+\textbf{entity overlap}. The mention context (the sentence, paragraph, or section that an entity mention occurs in) contains one or more entities. Similarly, the text of each entity aspect also contains entities. We count the number of unique overlapping entities between the mention context an entity aspect.
 
-\begin{quote}
-    \textit{Boris Johnson, perhaps the world's most famous coronavirus patient, was back at work Monday — after spending the worst of Britain's epidemic sidelined,
-first in self-isolation, then struggling to breathe in the hospital, and later in recovery in the countryside \footnote{https://www.washingtonpost.com/world/europe/boris-johnson-returns-to-work-after-missing-worst-of-coronavirus-epidemic/2020/04/27/95b590ea-8630-11ea-81a3-9690c9881111_story.html}}.
-\end{quote}
+\textbf{content overlap.} Similar to the \textbf{entity overlap} feature, we count the number of unique overlapping unigrams between the mention context and the entity aspect's main body of text.
 
-In a sentence such as the one above, we would not only prefer to link the mention \textit{Boris Johnson} to the aspect \textit{Prime Minister of the UK}, but also to one in which the entity is salient. We use SWAT \cite{swat}  to find the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages above, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
+\textbf{size}. This is simply the number of words contained in an entity aspect's main body of text.s
 
-%\paragraph{\textbf{Entity Relatedness. }}
-\subsection{Entity Relatedness}
-\label{subsec:Entity Relatedness}
-Entity Relatedness is a measure of how strongly related two entities are. For example, consider the entities, \textit{Boris Johnson}, \textit{Theresa May}, and \textit{Donald Trump}. Intuitively, one would say that \textit{Boris Johnson} is more strongly related to \textit{Theresa May} than to \textit{Donald Trump} because both \textit{Boris Johnson} and \textit{Theresa May} are British politicians and had some role in Brexit. We hypothesize that this measure of entity relatedness can help in aspect linking. More concretely, we hypothesize that an aspect mentioning many related entities to the target entity  is a good candidate for an aspect for the given target entity. For example, consider the aspect about \textit{Boris Johnson} pertaining to his role as the \textit{Prime Minister of UK} during the COVID-19 pandemic.
+\textbf{BM25}. The Okapi Best Match 25 (BM25) function is commonly used to rank documents according to relevance to a query. In this paper, the query consists of the mention context (sentence, paragraph, or section), while the documents represent candidate entity aspects. We consider two versions of BM25 dependant on the query field: BM25-header queries the section header of each aspect, while BM25-content queries the main body of text contained in the section that an entity aspect represents.
 
-\begin{quote}
-    \textbf{Aspect.} Prime Minister of UK \\
-    \textbf{Content.}
-    Former Prime Minister Theresa May has criticised world leaders for failing "to forge a coherent international response" to the coronavirus pandemic. Mrs May's intervention comes as Boris Johnson and Sir Keir Starmer face each other at Prime Minister's Questions for the first time later. \footnote{https://www.bbc.com/news/uk-politics-52553237}.
-\end{quote}
-The aspect above may be linked to the entity \textit{Boris Johnson} since it mentions several related entities such as \textit{Theresa May} and \textit{Sir Keir Starmer}. 
+\textbf{w-emb. } \ld{third person!} We embed both the mention context and the entity aspect main body of text using Word2Vec. Each embedding consists of the mean embedding of each word contained in the text. The final score is cosine similarity measures between the mention context embedding and the entity aspect embedding. 
 
-%\paragraph{\textbf{Co-occurring Entities.}}
-\subsection{Co-occurring Entities}
-\label{subsec:Co-occurring Entities}
-Co-occurring entities are entities which co-occur with a given entity in a particular context such as a sentence, passage or article. For example, entities which might co-occur with \textit{Boris Johnson} in a passage may be \textit{Theresa May}, \textit{United Kingdom} and \textit{Brexit}. We study the role of such co-occurring entities on the aspect linking task by comparing whether the frequency or relatedness of these co-occurring entities to the target entity is a better indicator of aspects and under what conditions they work. 
 
-\ld{Jordan's stuff...}
-\subsection{Joint Aspect Linking}\label{jordan-co-entity}
-One valuable source of context for which we can use to link an aspect to an entity mention, is that entities can be mentioned together in the same paragraph.
-We can use this context to further evaluate the relevance of aspects, given how much they have in common with the aspects of entities that co-occur in the same passage. 
-
-For example, the Chocolate Wikipedia page contains many sections that cover a broad array of subtopics. One of these sections is the ``Health Benefits of Chocolate'', which is notably smaller than the other sections in comparison. The section contains very specific medical terms that may not occur in a sentence where this section would be the correct aspect to link to. As an example, consider a sentence like ``Make sure that you keep away chocolate from your dogs.''. There is no indication that this has anything to do with health, but if we first linked the aspect of dogs, we would see that the ``Health'' section explicitly mentions the danger of poisoning from chocolate. Using this context, it then becomes clear what the relevant section is in Chocolate: not the section that mentions chocolate the most, but the one that talks about Theobromine poisoning and side effects.
-
-\textbf{Aspect Relevance.} Our task requires that we choose the aspect that best explains the context of an entity mention. We use a measure of relevance to represent the likelihood that an entity aspect should be linked to an entity given a mention and its surrounding context.
-
-\textbf{Co-Entity Similarity}. It is not always the case that we can use the context of co-entities to infer the context of an entity mention. For example, a very large paragraph can contain many co-entities that are spaced far apart. We would expect distance entities to share little context in common.
-We use measures of similarity between co-entities and entities to determine how much context they share in common.
-
-\textbf{Co-Aspect Similarity.}. One drawback of the Co-Entity similarity measure is that it is more of a global measure of contextual similarity. Consider the ``Chocolate'' example in section \ref{jordan-disambig}. Dogs and chocolates are not very related to each other, although we saw a context in which these two entities were related to each other, and that's the fact that chocolate is poisonous to dogs. Both entities have a section discussing this fact, but these sections are far smaller than the other sections in these entities by comparison. In the case of a global measure of inference, we would expect there to be a very weak correlation between chocolate and dogs, as they possess few overlapping topics. If we instead looked at the individual sections in each page, we would see that the ``Health'' section in ``Dog'' frequently mentions the dangers of chocolate and theobromine poisoning. 
-\ld{End of Jordan's stuff...}
+\ld{Remove what we do from this section: } When we compare the results of our features to that of the original authors', we note a minor discrepancy. This is likely due to the fact that our corpus statistics differ from that used in the original paper. It is also possible that our choice of tokenizer differs slightly from that of the original authors'. This highlights in attempting to exactly reproduce previous results, however we consider our results close enough for the purpose of comparison.

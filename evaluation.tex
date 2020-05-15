@@ -1,4 +1,3 @@
-\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1!}}
 
 \section{Evaluation}
 \label{sec:Evaluation}
@@ -20,7 +19,7 @@ In this section, a quantitative evaluation of our system is presented on the ent
 
 \textbf{Datasets.} Due to the lack of other datasets in this area, we use the Entity Aspect Linking dataset from Nanni et al.\cite{nanni2018entity}. It consists of 201 entity mentions from Wikipedia along with their sentence, paragraph and section context and a list of candidate aspects for the mention. We use this dataset for training a L2R algorithm using 5-fold cross validation. 
 
-We use the TREC Complex Answer Retrieval (CAR) track \cite{dietz2018trec}\footnote{\url{http://trec-car.cs.unh.edu}} dataset as a source of passages when building the Entity Context Document in Section \ref{subsubsec:Entity relatedness based features}. It consists of an entity linked corpus consisting of paragraphs from the entire English Wikipedia. 
+We use the TREC Complex Answer Retrieval (CAR) track \cite{dietz2018trec}\footnote{\url{http://trec-car.cs.unh.edu}} dataset as a source of passages when building the Entity Context Document (ECD) in Section \ref{subsubsec:Co-occurring entities with an entity from context}. It consists of an entity linked corpus consisting of paragraphs from the entire English Wikipedia. We construct a Lucene index of passages and use the top 100 passages retrieved using the entity name as the query to construct the ECD.
 
 Since neural networks require large training data to perform well and the dataset from Nanni et al. \cite{nanni2018entity} contains only 201 entity mention, we construct our own training data using the \textit{AllButBenchmark} from TREC CAR. \textit{AllButBenchmark} consists of nearly whole of Wikipedia (all pages and all sections on those pages along with the images embedded on the page), except for pages which were included in the official evaluation topics for years during which the track was active at TREC.
 
@@ -128,7 +127,7 @@ L2R                             & 0.006    & 0.009     & 0.005   \\ \bottomrule
                           & \multicolumn{2}{c|}{Sentence} & \multicolumn{2}{c|}{Paragraph} & \multicolumn{2}{c|}{Section}  \\ \hline
                           & P@1           & MRR           & P@1            & MRR           & P@1           & MRR           \\ \hline
 Original (from the paper) & 0.70$\pm$0.03 & 0.81$\pm$0.02 & 0.65$\pm$0.03  & 0.78$\pm$0.03 & 0.57$\pm$0.03 & 0.73$\pm$0.03 \\ \hline
-Re-implemented            & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ \hline
+Re-implemented (L2R)            & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ Re-implemented (Logistic)            & \ld{jordan add results}0.xx$\pm$0.xx & 0.xx$\pm$0. & 0.$\pm$0.  & 0.$\pm$0.03 & -- & -- \\\hline
 \end{tabular}
 \end{table*}
 
