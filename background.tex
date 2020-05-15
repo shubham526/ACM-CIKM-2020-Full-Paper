@@ -2,7 +2,9 @@
 \label{sec:Background}
 
 We re-implemented the lexical and semantic features from Nanni et
-al.\cite{nanni2018entity}. To give a brief recap, Nanni et al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use four methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings and, (4) Entity Embeddings. \todo{Jordan: This should be merged with the text below in this section.}
+al.\cite{nanni2018entity}. To give a brief recap, Nanni et %al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use five methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings, (4) Entity Embeddings, 
+
+Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model to represent entity aspects. To give a brief recap, Nanni et al.\cite{nanni2018entity} considers three different ways of comparing the context of the entity mention based on the following entity aspect fields: 1). Section header text, 2). The content (text) of a section, and 3). The entity links contained in the section. They use five methods to derive features from these fields: 1). TF-IDF or BM25 between the text surrounding the entity mention and one of the three entity aspect fields, 2). Cosine similarity using mean Word2Vec embeddings, 3). TF-IDF dot product using mean RDF2VEC entity embedding, and 4). Term overlap. Additionally, they use a context-independent feature, \textit{size}, which is simply the numbers of words in an entity aspect's text.
 
 \label{entity-aspect-representation}
 
@@ -11,17 +13,15 @@ al.\cite{nanni2018entity}. To give a brief recap, Nanni et al.\cite{nanni2018ent
 %\ld{Todo We don't have to explain things we did not use, but it might be helpful to say that he also used RDF2Vec, which we will replace with a different entity relatedness measure.}
 
 
-Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model to represent entity aspects. We implement the following features from the authors' paper:
-
-\textbf{entity overlap}. The mention context (the sentence, paragraph, or section that an entity mention occurs in) contains one or more entities. Similarly, the text of each entity aspect also contains entities. We count the number of unique overlapping entities between the mention context an entity aspect.
-
-\textbf{content overlap.} Similar to the \textbf{entity overlap} feature, we count the number of unique overlapping unigrams between the mention context and the entity aspect's main body of text.
-
-\textbf{size}. This is simply the number of words contained in an entity aspect's main body of text.s
-
-\textbf{BM25}. The Okapi Best Match 25 (BM25) function is commonly used to rank documents according to relevance to a query. In this paper, the query consists of the mention context (sentence, paragraph, or section), while the documents represent candidate entity aspects. We consider two versions of BM25 dependant on the query field: BM25-header queries the section header of each aspect, while BM25-content queries the main body of text contained in the section that an entity aspect represents.
-
-\textbf{w-emb. } \ld{third person!} We embed both the mention context and the entity aspect main body of text using Word2Vec. Each embedding consists of the mean embedding of each word contained in the text. The final score is cosine similarity measures between the mention context embedding and the entity aspect embedding. 
 
 
-\ld{Remove what we do from this section: } When we compare the results of our features to that of the original authors', we note a minor discrepancy. This is likely due to the fact that our corpus statistics differ from that used in the original paper. It is also possible that our choice of tokenizer differs slightly from that of the original authors'. This highlights in attempting to exactly reproduce previous results, however we consider our results close enough for the purpose of comparison.
+%\textbf{entity overlap}. The mention context (the sentence, paragraph, or section that an entity mention occurs in) contains one or more entities. Similarly, the text of each entity aspect also contains entities. We count the number of unique overlapping entities between the mention context an entity aspect.
+
+%\textbf{content overlap.} Similar to the \textbf{entity overlap} feature, we count the number of unique overlapping unigrams between the mention context and the entity aspect's main body of text.
+
+%\textbf{size}. This is simply the number of words contained in an entity aspect's main body of text.
+
+%\textbf{BM25}. The Okapi Best Match 25 (BM25) function is commonly used to rank documents according to relevance to a query. In this paper, the query consists of the mention context (sentence, paragraph, or section), while the documents represent candidate entity aspects. We consider two versions of BM25 dependant on the query field: BM25-header queries the section header of each aspect, while BM25-content queries the main body of text contained in the section that an entity aspect represents.
+
+%\textbf{w-emb. } \ld{third person!} We embed both the mention context and the entity aspect main body of text using Word2Vec. Each embedding consists of the mean embedding of each word contained in the text. The final score is cosine similarity measures between the mention context embedding and the entity aspect embedding. 
+
