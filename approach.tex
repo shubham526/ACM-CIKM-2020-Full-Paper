@@ -45,14 +45,20 @@ We use salience detection in our aspect-linking approach by incorporating the fo
 %\ld{Fede was using the entity relatedness measure "RDF2Vec", we replace this with other Entity Relatedness measures like in SWAT. However, we need to explain why we changed this. For example we can say that Rdf2Vec did not work as well, but that is a claim we need to substantiate with evidence. @jordan was playing around with Rdf2vec but did not get good results, maybe we can include some of these 'bad' results to support our point?  @shubham maybe you can get some of the Rdf2Vec results and say a few words about how they differ.  I can imagine that RDF2Vec does not work so well, because it is trained on typed  relations available in DBpedia, but these are mostly about people, organizations, and places. I don't know what SWAT is trained on, but even if it is hyperlinks on Wikipedia, it has a better chance of working in our "open-domain" topic.  --- Of course this is speculation, but if we can substantiate the speculation, it would make this paper even stronger. }
 
 
-Entity Relatedness is a measure of how strongly related two entities are. For example, consider the entities, \textit{Boris Johnson}, \textit{Theresa May}, and \textit{Donald Trump}. Intuitively, one would say that \textit{Boris Johnson} is more strongly related to \textit{Theresa May} than to \textit{Donald Trump} because both \textit{Boris Johnson} and \textit{Theresa May} are British politicians and had some role in Brexit. We hypothesize that this measure of entity relatedness can help in aspect linking. More concretely, we hypothesize that an aspect mentioning many related entities to the target entity  is a good candidate for an aspect for the given target entity. For example, consider the aspect about \textit{Boris Johnson} pertaining to his role as the \textit{Prime Minister of UK} during the COVID-19 pandemic.
+Entity Relatedness is a measure of how strongly related two entities are. For example, consider the entities, \textit{Boris Johnson}, \textit{Theresa May}, and \textit{Donald Trump}. Intuitively, one would say that \textit{Boris Johnson} is more strongly related to \textit{Theresa May} than to \textit{Donald Trump} because both \textit{Boris Johnson} and \textit{Theresa May} are British politicians and had some role in Brexit. We hypothesize that this measure of entity relatedness can help in aspect linking. More concretely, we hypothesize that an aspect mentioning many related entities to the target entity  is a good candidate for an aspect for the given target entity. For example, consider the aspect about \textit{Boris Johnson} pertaining to his role as the \textit{Prime Minister of UK} during the COVID-19 pandemic as given in Figure \ref{fig:relatedness-example}.
 
-\begin{quote}
-    \textbf{Aspect.} Prime Minister of UK \\
-    \textbf{Content.}
-    Former Prime Minister Theresa May has criticised world leaders for failing "to forge a coherent international response" to the coronavirus pandemic. Mrs May's intervention comes as Boris Johnson and Sir Keir Starmer face each other at Prime Minister's Questions for the first time later. \footnote{https://www.bbc.com/news/uk-politics-52553237}.
-\end{quote}
-The aspect above may be linked to the entity \textit{Boris Johnson} since it mentions several related entities such as \textit{Theresa May} and \textit{Sir Keir Starmer}. 
+\begin{figure}[t]
+    \centering
+    \begin{quote}
+        \textbf{Aspect.} Prime Minister of UK \\
+        \textbf{Content.}
+         Former Prime Minister Theresa May has criticised world leaders for failing "to forge a coherent international response" to the coronavirus pandemic. Mrs May's intervention comes as Boris Johnson and Sir Keir Starmer face each other at Prime Minister's Questions for the first time later. \footnote{https://www.bbc.com/news/uk-politics-52553237}.
+    \end{quote}
+    \caption{Example aspect with content to depict entity relatedness intuition.}
+    \label{fig:relatedness-example}
+\end{figure}
+
+The aspect in Figure \ref{fig:relatedness-example} may be linked to the entity \textit{Boris Johnson} since it mentions several related entities such as \textit{Theresa May} and \textit{Sir Keir Starmer}. 
 
 
 Co-occurring entities are entities which co-occur with a given entity in a particular context such as a sentence, passage or article. For example, entities which might co-occur with \textit{Boris Johnson} in a passage may be \textit{Theresa May}, \textit{United Kingdom} and \textit{Brexit}. We study the role of such co-occurring entities on the aspect linking task by comparing whether the frequency or relatedness of these co-occurring entities to the target entity is a better indicator of aspects and under what conditions they work. 
@@ -84,7 +90,7 @@ Co-occurring entities are entities which co-occur with a given entity in a parti
 %     \end{equation}
 %     where $e'$ is an entity in the aspect $A$ which also frequently co-occurs with $e$, $e_T$ is the target entity, $e$ is an entity from the context around the target entity $e_T$, and $\text{Relatedness}(e', e_T)$ is found using WAT \cite{piccinno2014wat}.
 
-The method of Nanni et al. uses an exact matches of contextual entities $e'$ in the context and aspect content. However since there are only few such entities, we explore methods to derive an expanded set of prominent entities $e'$, then rank aspects by how frequently they match these most prominent entities $e'$. 
+The method of Nanni et al. uses exact matches of contextual entities $e'$ in the context and aspect content. However since there are only few such entities, we explore methods to derive an expanded set of prominent entities $e'$, then rank aspects by how frequently they match these most prominent entities $e'$. 
 
 For every entity $e$ in the context of the target entity $e_T$ (sentence, paragraph or section), we retrieve top $k$ passages from a background corpus using $e$'s name as a query. (For the evaluation we arbitrarily chose $k=100$, results of other contexts will be made available in an online appendix). We construct a bag of potential expansion entities (henceforth called PROM in this paper) from all entities mentioned in all $E \times k$ passages that were retrieved through $E$ queries, one for each contextual entity $e$. We calculate the frequency $\text{tf}_{e}(e')$ with which entities occur in the passage ranking for entity $e$ as follows:
 
@@ -149,15 +155,15 @@ Since contextual entities $e$ might be less well suited than the target entity $
     \item \textbf{Rel-Dist-Wiki.} Instead of identifying entities through other passages, we consider entities $e'$ mentioned on the Wikipedia page of the target entity $e_T$. These entities $e'$ are ranked by relatedness to $e_T$.
 \end{enumerate}
 
-Instead of ranking aspects $a$ by a sum of prominence/relatedness scores that they contain, we invert the approach and rank aspects by retrieval models. The query is formed by the title of the target entity which expanded with top 20 entities $e'$ --- these are weighted in the query akin to RM3 \cite{lavrenko2001relevance}. We explore weighted combinations of retrieval models as implemented in Lucene. BM25 (default parameters), Language Models with Jelinek-Mercer (LMJM) smoothing $(\lambda = 0.4)$, and Language Models with Dirichlet (LMDS) smoothing, with both RM1 and RM3 expansion models on entities.
+Instead of ranking aspects $a$ by a sum of prominence/relatedness scores that they contain, we invert the approach and rank aspects by retrieval models. The query is formed by the title of the target entity which is expanded with top 20 entities $e'$ --- these are weighted in the query akin to RM3 \cite{lavrenko2001relevance}. We explore weighted combinations of the following retrieval models as implemented in Lucene: (1) BM25 (default parameters), (2) Language Models with Jelinek-Mercer (LMJM) smoothing $(\lambda = 0.4)$, and (3) Language Models with Dirichlet (LMDS) smoothing, with both RM1 and RM3 expansion models on entities.
 
 
     
 %    from Equation  \ref{eq:score-aspect-using-simple-freq-dist} with either frequency distribution \textbf{(SF-Dist-ECD)} or relatedness distribution \textbf{(Rel-Dist-ECD/Rel-Dist-Wiki)} over co-occurring entities to score an aspect.
 \begin{enumerate}        
-    \item \textbf{RS-Asp-Freq-PROM.} Expand query weighted by prominence score.
-    \item \textbf{RS-Asp-Rel-PROM.} Expand query weighted by relatedness score.
-    \item \textbf{RS-Asp-Rel-Wiki.} Expand with top 20 entities by relatedness (to $e_T$) on Wikipedia page of $e_T$.
+    \item \textbf{RS-Asp-Freq-PROM.} Expand query weighted by prominence score and retrieve aspects.
+    \item \textbf{RS-Asp-Rel-PROM.} Expand query weighted by relatedness score and retrieve aspects.
+    \item \textbf{RS-Asp-Rel-Wiki.} Expand with top 20 entities by relatedness (to $e_T$) on Wikipedia page of $e_T$ and retrieve aspects.
 \end{enumerate}
 
 

@@ -22,13 +22,13 @@ Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model t
 They use five methods to derive features from these fields: 
 
 \begin{enumerate}
-    \item \textbf{TF-IDF} Cosine similarity between the TF-IDF (logarithmic, L2-normalized) vector of contextual mention and aspect field.
+    \item \textbf{TF-IDF.} Cosine similarity between the TF-IDF (logarithmic, L2-normalized) vector of contextual mention and aspect field.
     \item \textbf{BM25.} Rank aspect representations using the contextual mention as a query using BM25 ($k_1=2, b=0.75)$.
-    \item \textbf{Word embeddings} Cosine similarity between the mention in context and
+    \item \textbf{Word Embeddings.} Cosine similarity between the mention in context and
 the aspect using pre-trained GloVe \cite{pennington2014glove} embeddings of dimension 300. 
-    \item \textbf{Entity embeddings} Using 500 dimensional RDF2Vec \cite{ristoski2016rdf2vec} embeddings to embed entities in the context of the entity mention and a section from the Wikipedia page of the entity, then compute the document vector using the TF-IDF of an an entity in context of the entity mention and its embedding.
-    \item \textbf{Term overlap} Number of shared words after tokenization.
-    \item \textbf{Size} a context-independent feature, which is the numbers of words in an entity aspect's text.
+    \item \textbf{Entity Embeddings.} Using 500 dimensional RDF2Vec \cite{ristoski2016rdf2vec} embeddings to embed entities in the context of the entity mention and a section from the Wikipedia page of the entity, then compute the document vector using the TF-IDF of an an entity in context of the entity mention and its embedding.
+    \item \textbf{Term Overlap.} Number of shared words after tokenization.
+    \item \textbf{Size.} a context-independent feature, which is the numbers of words in an entity aspect's text.
 \end{enumerate}
 
 Furthermore, they explore different context sizes, sentence, paragraph, and section.

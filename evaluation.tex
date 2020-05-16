@@ -1,15 +1,15 @@
 
 \section{Evaluation}
 \label{sec:Evaluation}
-In this section, a quantitative evaluation of our system is presented on the entity-aspect dataset from Nanni et al.\cite{nanni2018entity}. We begin by presenting some research questions pertaining to three broad components of our system: Entity Salience, Entity Relatedness and Co-occurring entities, which our experiments aim to address(Section \ref{subsec:Research Questions}). We then describe our experimental settings (Section \ref{subsec:Evaluation Paradigm}), followed by the baselines (Section \ref{subsec:Reproduction of Baselines}). We end this section with a discussion of our experiments and results (Sections \ref{subsec:Results} through \ref{subsec:Frequency vs Relatedness}).
+In this section, a quantitative evaluation of our system for the Entity Aspect Linking (EAL) task is presented on the entity-aspect dataset from Nanni et al.\cite{nanni2018entity}. We begin by presenting some research questions pertaining to three broad components of our system: Entity Salience, Entity Relatedness and Co-occurring entities, which our experiments aim to address(Section \ref{subsec:Research Questions}). We then describe our experimental settings (Section \ref{subsec:Evaluation Paradigm}), followed by the baselines (Section \ref{subsec:Reproduction of Baselines}). We end this section with a discussion of our experiments and results (Sections \ref{subsec:Results} through \ref{subsec:Frequency vs Relatedness}).
 
-%\subsection{Research Questions}
+\subsection{Research Questions}
 \label{subsec:Research Questions}
 We study the following research questions:
 \begin{itemize}
 \item[\textbf{RQ1}] To which extent can  entity salience help EAL?
 \item[\textbf{RQ2}] To which extent can entity relatedness help EAL?
-\item[\textbf{RQ3}] Is the frequency of relatedness of co-occurring entities a better indicator of aspects? 
+\item[\textbf{RQ3}] Is the frequency or relatedness of co-occurring entities a better indicator of aspects? 
 \item[\textbf{RQ4}] To which extent are we predicting helpful entities?
 \end{itemize}
 
@@ -21,7 +21,7 @@ We study the following research questions:
 Nanni derived this dataset of aspect link examples from hyperlinks on Wikipedia pages that refer to sections on other pages.  It omits hyperlinks to administrative sections such as ``References'', ``See Also'', etc. Each training example contains the sentence context, paragraph context, entity mention and candidate aspects. The candidate aspects are the top level sections of the Wikipedia page of the entity linked to the mention. 
 Each candidate aspect contains information about its section header, text, and entities that are contained within it.
 
-The data sets contains entity links from hyperlinks to other Wikipedia pages (in both context and aspect content). In addition, we use WAT \cite{piccinno2014wat} to annotate additional entity links the context and aspect content.
+The data sets contains entity links from hyperlinks to other Wikipedia pages (in both context and aspect content). In addition, we use WAT \cite{piccinno2014wat} to annotate additional entity links in the context and aspect content.
 
 
 \paragraph{\textbf{Passage Corpus.}}
@@ -41,17 +41,17 @@ We use dataset from Nanni et al. \cite{nanni2018entity} for evaluation. It conta
 %The ground truth for our new training data was constructed in a similar way: the true aspect of an entity mention is the top-level section on the Wikipedia page of the entity linked to the mention and in which the mention appears.
 
 \paragraph{\textbf{Evaluation Metrics.}}
-Our methods predict a ranking of aspects. We use Precision at 1 (P@1) and Mean Reciprocal Rank (MRR) as our evaluation metrics. If the correct aspect is found at rank $r$, MRR score is $\frac{1}{r}$. Since there is only one correct aspect, MRR and mean-average precision are identical.
+Our methods predict a ranking of aspects. We use Precision at 1 (P@1) and Mean Reciprocal Rank (MRR) as our evaluation metrics. If the correct aspect is found at rank $r$, MRR score is $\frac{1}{r}$. Since there is only one correct aspect, MRR and Mean Average Precision (MAP) are identical. In addition, we also use Success@3 and NDCG@10.
 
-\ld{Add additional metrics success@3 ndcg@10}
+%\ld{Add additional metrics success@3 ndcg@10}
 
-\ld{describe the experimental setup where we evaluate entities, some text like this:}
+%\ld{describe the experimental setup where we evaluate entities, some text like this:}
 \paragraph{\textbf{Entity ranking experiments .}}
-Since our contribution emphasizes the prediction of intermediate entities for entity aspect linking, we also evaluate quality of the ranked entities. We do not evaluate it as a usual entity ranking task, since we are interested whether we rank entities high that are contained in the aspect content. The rationale is, if we rank entities high that are mentioned in the correct aspect, we more likely to obtain a better aspect ranking as a result. 
+Since our contribution emphasizes the prediction of intermediate entities for entity aspect linking, we also evaluate quality of the ranked entities. We do not evaluate it as a usual entity ranking task, since we are interested in whether we rank entities high that are contained in the aspect content. The rationale is, if we rank entities high that are mentioned in the correct aspect, we are more likely to obtain a better aspect ranking as a result. 
 
-We evaluate entity rankings in terms of mean-average precision (MAP), which is a generalization of MRR when multiple rank entries are correct.\footnote{We are aware of concerns raised by Fuhr \cite{fuhr2018some} about the usefulness of MAP as a user model. However, here we evaluate the usefulness of entities for the aspect ranking task, these are not intended to be displayed to the user.}
+We evaluate our entity rankings in terms of Mean-Average Precision (MAP), which is a generalization of MRR when multiple rank entries are correct.\footnote{We are aware of concerns raised by Fuhr \cite{fuhr2018some} about the usefulness of MAP as a user model. However, here we evaluate the usefulness of entities for the aspect ranking task, these are not intended to be displayed to the user.}
 
-\ld{ end of my addition}
+%\ld{ end of my addition}
 
 \paragraph{\textbf{Entity Salience Detection.}}
 We use SWAT \cite{swat}  to determine the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages in Figure \ref{fig:Salience}, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
@@ -96,7 +96,7 @@ We use two baselines from Nanni et al.
 
 %\subsubsection{Reproduction of Nanni's Approach.}
 
-In Table \ref{tab:Reproducible-results}, we compare the results of our features to that of the original authors', we note a minor discrepancy, which is mostly within standard error. This is likely due to differing corpus statistics or tokenization choices; however we consider our results close enough for the purpose of comparison. 
+In Table \ref{tab:Reproducible-results}, we compare the results of our features to that of the original authors'. We note a minor discrepancy, which is mostly within standard error. This is likely due to differing corpus statistics or tokenization choices; however we consider our results close enough for the purpose of comparison. Note that Table \ref{tab:Reproducible-results} shows the L2R results which were obtained using Nanni's features. The results from individual features were omitted due to space constraints and will be made availabe in an online appendix.
 
 %Since the joint-aspect method relies on logistic regression, which is known to produce slightly worse results, we provide results of features from Nanni et al, which is trained with a logistic regression model.
 
@@ -113,39 +113,17 @@ The most interesting results are presented in Table \ref{tab:Results-shubham}. D
     \label{fig:difficulty-plot}
 \end{figure}
 
-\begin{table}[t]
-\caption{Performance of individual entity rankings (in terms of MAP) on different contexts obtained using frequency and relatedness and combined with L2R.}
-\label{tab:Results-Entity-Rankings-Freq-And-Rel}
-\begin{tabular}{@{}llll@{}}
- \toprule
-            & Sentence & Paragraph & Section \\ \midrule
-Frequency   & 0.04     & 0.06      & 0.13    \\
-Relatedness & 0.03     & 0.03      & 0.04    \\ \midrule
-L2R         & 0.01     & 0.02      & 0.03   \\
- \bottomrule
-\end{tabular}
-\end{table}
-
-%\input{table-Results-Entity-Rankings-Freq-And-Rel}
-
-%\input{table-Results-Entity-Rankings-Sal}
 
 
-%\input{table-Helps-Hurts-Analysis}
+\input{table-Results-Entity-Rankings-Freq-And-Rel}
 
-\begin{table*}[t]
-\caption{Results from Nanni et al.\cite{nanni2018entity} and from our implementation of their methods.}
-\label{tab:Reproducible-results}
-\begin{tabular}{ccccccc}
-\toprule
-                          & \multicolumn{2}{c}{Sentence} & \multicolumn{2}{c}{Paragraph} & \multicolumn{2}{c}{Section}  \\ \hline
-                          & P@1           & MRR           & P@1            & MRR           & P@1           & MRR           \\
-\midrule
-Original (from the paper) & 0.70$\pm$0.03 & 0.81$\pm$0.02 & 0.65$\pm$0.03  & 0.78$\pm$0.03 & 0.57$\pm$0.03 & 0.73$\pm$0.03 \\ 
-Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ 
-\bottomrule
-\end{tabular}
-\end{table*}
+\input{table-Results-Entity-Rankings-Sal}
+
+
+\input{table-Helps-Hurts-Analysis}
+
+\input{table-Reproducible-results}
+
 
 \begin{table*}[t]
     \caption{Performance with standard error of individual entity salience and relatedness features and combined with L2R, including subsets/ablations.}
@@ -153,22 +131,37 @@ Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.7
     %\scalebox{0.9}{
     \begin{tabular}{@{}lllll@{}}
         \toprule
-        Method & P@1 & MRR & Success@3 & NDCG@10 \\
+        Method & P@1 & MRR & Success@5 & NDCG@10 \\
         
         \midrule
         
         Nanni et al. (Sentence) &
-        0.67$\pm$0.03 & 0.79$\pm$0.02 \\
+        0.67$\pm$0.03 & 
+        0.79$\pm$0.02 &
+        0.97$\pm$0.03 &
+        0.85$\pm$0.03
+        \\
         
          Nanni et al. (Paragraph) &
-        0.64$\pm$0.03  & 0.78$\pm$0.03 \\
+        0.64$\pm$0.03  & 
+        0.78$\pm$0.03 &
+         0.99$\pm$0.03 &
+        0.84$\pm$0.03
+        
+        \\
         
          Nanni et al. (Section) &
-       0.53$\pm$0.03 & 0.71$\pm$0.03 \\
+       0.53$\pm$0.03 & 
+       0.71$\pm$0.03 &
+        0.97$\pm$0.03 &
+        0.78$\pm$0.03
+       \\
      
       Size &
       0.39$\pm$0.03&
-      0.60$\pm$0.03
+      0.60$\pm$0.03 &
+       0.93$\pm$0.03 &
+        0.70$\pm$0.03
       \\
       
       \midrule
@@ -176,107 +169,141 @@ Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.7
      
     Sal-EM   &   
       0.19$\pm$0.03 &
-      0.46$\pm$0.03
+      0.46$\pm$0.03 &
+       0.82$\pm$0.03 &
+        0.58$\pm$0.03
       \\
       
       
       
       SEC (Sentence)  &    
       0.23$\pm$0.03 &
-      0.53$\pm$0.03
+      0.53$\pm$0.03 &
+       0.85$\pm$0.03 &
+        0.63$\pm$0.03
       \\
       
       
       AEC (Sentence)   &    
       0.51$\pm$0.03 &
-      0.70$\pm$0.03
+      0.70$\pm$0.03 &
+       0.95$\pm$0.03 &
+        0.77$\pm$0.03
       \\
        \midrule
       
      
       SF-Dist (Sentence)   &    
       0.54$\pm$0.03 &
-      0.72$\pm$0.03
+      0.72$\pm$0.03 &
+       0.96$\pm$0.03 &
+        0.79$\pm$0.03
       \\
       
      
       WF-Dist (Sentence)  &    
       0.49$\pm$0.03 &
-      0.67$\pm$0.03
+      0.67$\pm$0.03 &
+       0.94$\pm$0.03 &
+        0.75$\pm$0.03
       \\
       
       
       Rel-Dist (Sentence)  &    
       0.43$\pm$0.03 &
-     0.62$\pm$0.03
+     0.62$\pm$0.03 &
+      0.94$\pm$0.03 &
+        0.72$\pm$0.03
       \\
        \midrule
       
     
-      SF-Dist-ECD   &    
+      SF-Dist-PROM   &    
       0.35$\pm$0.03 &
-      0.59$\pm$0.03
+      0.59$\pm$0.03 &
+       0.93$\pm$0.03 &
+        0.69$\pm$0.03
       \\
       
       
-      Rel-Dist-ECD  &    
+      Rel-Dist-PROM  &    
       0.36$\pm$0.03 &
-      0.60$\pm$0.03
+      0.60$\pm$0.03 &
+       0.90$\pm$0.03 &
+        0.69$\pm$0.03
       \\
       
      
-      RS-Asp-Freq-ECD (LMJM + RM1)  &     
+      RS-Asp-Freq-PROM (LMJM + RM1)  &     
       0.35$\pm$0.03 &
-      0.59$\pm$0.03
+      0.59$\pm$0.03 &
+       0.90$\pm$0.03 &
+        0.67$\pm$0.03
       \\
       
        
-      RS-Asp-Rel-ECD (LMJM + RM1) &     
+      RS-Asp-Rel-PROM (LMJM + RM1) &     
       0.40$\pm$0.03 &
-      0.60$\pm$0.03
+      0.60$\pm$0.03 &
+       0.91$\pm$0.03 &
+        0.69$\pm$0.03
       \\
        \midrule
       
       
       Rel-Dist-Wiki  &    
       0.37$\pm$0.03 &
-      0.60$\pm$0.03
+      0.60$\pm$0.03 &
+       0.92$\pm$0.03 &
+        0.69$\pm$0.03
       \\
       
       
        
       RS-Asp-Rel-Wiki (BM25 + RM3)  &     
       0.39$\pm$0.03 &
-      0.61$\pm$0.03
+      0.61$\pm$0.03 &
+       0.93$\pm$0.03 &
+        0.70$\pm$0.03
       \\
       \midrule
       
        Subset-1 (Only Relatedness) &
       0.48$\pm$0.03 &
-      0.68$\pm$0.03
+      0.68$\pm$0.03 &
+       0.96$\pm$0.03 &
+        0.75$\pm$0.03
       \\
       
       
       Subset-2 (Only Salience) &
       0.59$\pm$0.03 &
-      0.72$\pm$0.03
+      0.72$\pm$0.03 &
+       0.93$\pm$0.03 &
+        0.78$\pm$0.03
       \\
       
        Subset-3 (Rel. + Lex. + Sem.) &
       0.66$\pm$0.03 &
-      0.78$\pm$0.03
+      0.78$\pm$0.03 &
+       0.97$\pm$0.03 &
+        0.83$\pm$0.03
       \\
       
        Subset-4 (Sal + Lex. + Sem.) &
       
       0.72$\pm$0.03 &
-      0.82$\pm$0.03
+      0.82$\pm$0.03 &
+       0.97$\pm$0.03 &
+        0.87$\pm$0.03
       \\
       
       
       Subset-5 (Sal. + Rel. + Lex. + Sem.) &
       0.70$\pm$0.03 &
-      0.81$\pm$0.03
+      0.81$\pm$0.03 &
+       0.97$\pm$0.03 &
+        0.85$\pm$0.03
       \\
      
       

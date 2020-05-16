@@ -1,0 +1,13 @@
+\begin{table*}[t]
+\caption{Results from Nanni et al.\cite{nanni2018entity} and from our implementation of their methods.}
+\label{tab:Reproducible-results}
+\begin{tabular}{ccccccc}
+\toprule
+                          & \multicolumn{2}{c}{Sentence} & \multicolumn{2}{c}{Paragraph} & \multicolumn{2}{c}{Section}  \\ \hline
+                          & P@1           & MRR           & P@1            & MRR           & P@1           & MRR           \\
+\midrule
+Original (from the paper) & 0.70$\pm$0.03 & 0.81$\pm$0.02 & 0.65$\pm$0.03  & 0.78$\pm$0.03 & 0.57$\pm$0.03 & 0.73$\pm$0.03 \\ 
+Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ 
+\bottomrule
+\end{tabular}
+\end{table*}

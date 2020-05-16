@@ -1,6 +1,7 @@
 \section{Introduction}
 \label{sec:Introduction}
 
+\subsection{Motivation}
 
 The larger goal of our work is to support efficient information access on complex topics. 
 %
@@ -34,7 +35,7 @@ Finally, the benefits of an entity-aspect-linker go much beyond classifying into
 
 \bigskip
 %\ld{TODO! I keep on referring to context and content, I think we need a figure for that.}
-In the following we distinguish between context and content: the context is the text surrounding the entity mention we seek to aspect-link. With content, we refer to content associated with the aspect. This is depicted in Figure \ref{fig:context-vs-content}.
+In the following, we distinguish between context and content: the context is the text surrounding the entity mention we seek to aspect-link. With content, we refer to content associated with the aspect. This is depicted in Figure \ref{fig:context-vs-content}.
 
 \begin{figure}
     \centering
@@ -45,8 +46,8 @@ In the following we distinguish between context and content: the context is the 
 
 Nanni et al. \cite{nanni2018entity} introduce the entity aspect linking task and suggest a combination of text similarity metrics between mention context and aspect content. One of the similarity metrics includes the overlap and similarity of other entities mentioned in context and aspect content. However, their approach would consider all entities equally important for the aspect-linking decision. We believe the approach can be improved by incorporating the entity salience, entity relatedness, and joint aspect linking.  
 
-In context and content, only few entities are salient (that is, central), while most other entities are mentioned in passing, such as in examples, circumstantial references, or clarifications. Approaches for entity salience detection have been developed  recently \cite{dunietz-gillick-2014-new, xiong2018towards, swat} %\ld{cite Dunnietz, cite Xiong, cite SWAT}.\ld{TODO I made this up, can someone confirm:} In an initial analysis we found that that aspect linking suffers from false-positive aspects which are introduced by spurious entity matches.
-In this work, we explore to which extent salience detection can avoid false positives. We describe entity salience in with an example in Section \ref{subsec:Entity Salience for Aspect Linking}, when we describe our methods which use salience.
+In context and content, only few entities are salient (that is, central), while most other entities are mentioned in passing, such as in examples, circumstantial references, or clarifications. Approaches for entity salience detection have been developed  recently \cite{dunietz-gillick-2014-new, xiong2018towards, swat}. %\ld{cite Dunnietz, cite Xiong, cite SWAT}.\ld{TODO I made this up, can someone confirm:} In an initial analysis we found that that aspect linking suffers from false-positive aspects which are introduced by spurious entity matches.
+In this work, we explore the extent to which salience detection can help our task. We describe entity salience with an example in Section \ref{subsec:Entity Salience for Aspect Linking}, when we describe our methods which use salience.
 %A detailed introduction to entity salience is given in Section \ref{sec:Background}.
 
 % ruback2018computing : Computing Entity Semantic Similarity by Feature Ranking
