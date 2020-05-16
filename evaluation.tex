@@ -3,9 +3,9 @@
 \label{sec:Evaluation}
 In this section, a quantitative evaluation of our system is presented on the entity-aspect dataset from Nanni et al.\cite{nanni2018entity}. We begin by presenting some research questions pertaining to three broad components of our system: Entity Salience, Entity Relatedness and Co-occurring entities, which our experiments aim to address(Section \ref{subsec:Research Questions}). We then describe our experimental settings (Section \ref{subsec:Evaluation Paradigm}), followed by the baselines (Section \ref{subsec:Reproduction of Baselines}). We end this section with a discussion of our experiments and results (Sections \ref{subsec:Results} through \ref{subsec:Frequency vs Relatedness}).
 
-\subsection{Research Questions}
+%\subsection{Research Questions}
 \label{subsec:Research Questions}
-
+We study the following research questions:
 \begin{itemize}
 \item[\textbf{RQ1}] To which extent can  entity salience help EAL?
 \item[\textbf{RQ2}] To which extent can entity relatedness help EAL?
@@ -43,6 +43,15 @@ We use dataset from Nanni et al. \cite{nanni2018entity} for evaluation. It conta
 \paragraph{\textbf{Evaluation Metrics.}}
 Our methods predict a ranking of aspects. We use Precision at 1 (P@1) and Mean Reciprocal Rank (MRR) as our evaluation metrics. If the correct aspect is found at rank $r$, MRR score is $\frac{1}{r}$. Since there is only one correct aspect, MRR and mean-average precision are identical.
 
+\ld{Add additional metrics success@3 ndcg@10}
+
+\ld{describe the experimental setup where we evaluate entities, some text like this:}
+\paragraph{\textbf{Entity ranking experiments .}}
+Since our contribution emphasizes the prediction of intermediate entities for entity aspect linking, we also evaluate quality of the ranked entities. We do not evaluate it as a usual entity ranking task, since we are interested whether we rank entities high that are contained in the aspect content. The rationale is, if we rank entities high that are mentioned in the correct aspect, we more likely to obtain a better aspect ranking as a result. 
+
+We evaluate entity rankings in terms of mean-average precision (MAP), which is a generalization of MRR when multiple rank entries are correct.\footnote{We are aware of concerns raised by Fuhr \cite{fuhr2018some} about the usefulness of MAP as a user model. However, here we evaluate the usefulness of entities for the aspect ranking task, these are not intended to be displayed to the user.}
+
+\ld{ end of my addition}
 
 \paragraph{\textbf{Entity Salience Detection.}}
 We use SWAT \cite{swat}  to determine the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages in Figure \ref{fig:Salience}, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
@@ -117,35 +126,12 @@ L2R         & 0.01     & 0.02      & 0.03   \\
 \end{tabular}
 \end{table}
 
+%\input{table-Results-Entity-Rankings-Freq-And-Rel}
+
+%\input{table-Results-Entity-Rankings-Sal}
 
 
-\begin{table*}[t]
-\caption{Performance of individual entity rankings (in terms of MAP) on different contexts obtained using entity salience and combined with L2R.}
-\label{tab:Results-Entity-Rankings-Sal}
-\begin{tabular}{@{}llll@{}}
-\toprule
-                                & Sentence & Paragraph & Section \\ \midrule
-Context-Salient-Content-Salient & 0.002    & 0.001     & 0.003   \\
-Context-Salient-Content-All     & 0.009    & 0.005     & 0.008   \\
-Context-All-Content-Salient     & 0.006    & 0.008     & 0.003   \\
-Context-All-Content-All         & 0.02     & 0.02      & 0.01    \\ \midrule
-L2R                             & 0.006    & 0.009     & 0.005   \\ \bottomrule
-\end{tabular}
-\end{table*}
-
-\begin{table*}[t]
-\caption{Helps-Hurts analysis for frequency versus relatedness.}
-\label{tab:Helps-Hurts-Analysis}
-\begin{tabular}{lcccccc}
-\toprule
-                                & \multicolumn{6}{c}{Relatedness}                                                              \\ 
-                                & \multicolumn{2}{c}{Sentence} & \multicolumn{2}{c}{Paragraph} & \multicolumn{2}{c}{Section} \\ 
-                                & Helps         & Hurts         & Helps          & Hurts         & Helps         & Hurts        \\ 
-\midrule
-\multicolumn{1}{c}{Frequency} & 679           & 15            & 1018           & 9             & 1160          & 3            \\ 
-\bottomrule
-\end{tabular}
-\end{table*}
+%\input{table-Helps-Hurts-Analysis}
 
 \begin{table*}[t]
 \caption{Results from Nanni et al.\cite{nanni2018entity} and from our implementation of their methods.}
@@ -167,7 +153,7 @@ Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.7
     %\scalebox{0.9}{
     \begin{tabular}{@{}lllll@{}}
         \toprule
-        Method & P@1 & MRR \\ 
+        Method & P@1 & MRR & Success@3 & NDCG@10 \\
         
         \midrule
         
