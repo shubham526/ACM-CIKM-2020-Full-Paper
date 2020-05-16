@@ -1,16 +1,49 @@
 \section{Background}
 \label{sec:Background}
-
-We re-implemented the lexical and semantic features from Nanni et
-al.\cite{nanni2018entity}. To give a brief recap, Nanni et %al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use five methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings, (4) Entity Embeddings, 
-
-Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model to represent entity aspects. To give a brief recap, Nanni et al.\cite{nanni2018entity} considers three different ways of comparing the context of the entity mention based on the following entity aspect fields: 1). Section header text, 2). The content (text) of a section, and 3). The entity links contained in the section. They use five methods to derive features from these fields: 1). TF-IDF or BM25 between the text surrounding the entity mention and one of the three entity aspect fields, 2). Cosine similarity using mean Word2Vec embeddings, 3). TF-IDF dot product using mean RDF2VEC entity embedding, and 4). Term overlap. Additionally, they use a context-independent feature, \textit{size}, which is simply the numbers of words in an entity aspect's text.
-
+\label{subsubsec:Lexical and Semantic features} 
 \label{entity-aspect-representation}
 
-%\ld{Todo: rewrite in third person (no "we", and now mention of what we will be doing here, this is strictly Fede's work, no ours). Here we only explain the part of Fede's work that we recycle.}
+Nanni et al.\cite{nanni2018entity} suggest a range of the lexical and semantic features. Since our method builds on these features, we briefly describe them here.
+%al.\cite{nanni2018entity} consider three types of aspect representations and rank aspects based on similarity of mention in context to:(1) Header, (2) Content and, (3) Entity overlap with each section on the Wikipedia page of the entity. They use five methods to derive features from the aspect representations above: (1) TF-IDF, (2) BM25, (3) Word Embeddings, (4) Entity Embeddings, 
 
-%\ld{Todo We don't have to explain things we did not use, but it might be helpful to say that he also used RDF2Vec, which we will replace with a different entity relatedness measure.}
+Nanni et al. \cite{nanni2018entity} uses a ``bag of words'' vector space model to represent entity aspects. They consider three different ways of comparing the context of the entity mention based on the following entity aspect fields:
+
+
+\begin{enumerate}
+
+\item \textbf{Header.} Rank aspects based on similarity of the mention in context to the header of each section in the Wikipedia page.
+
+\item \textbf{Content.} Rank aspects based on the similarity between the mention in context and the content of each section of the Wikipedia page of the entity.
+
+\item \textbf{Entity.} Overlap of entities mentioned in the context of the entity mention and the content of a section on the Wikipedia page of the entity.
+\end{enumerate}
+
+
+They use five methods to derive features from these fields: 
+
+\begin{enumerate}
+    \item \textbf{TF-IDF} Cosine similarity between the TF-IDF (logarithmic, L2-normalized) vector of contextual mention and aspect field.
+    \item \textbf{BM25.} Rank aspect representations using the contextual mention as a query using BM25 ($k_1=2, b=0.75)$.
+    \item \textbf{Word embeddings} Cosine similarity between the mention in context and
+the aspect using pre-trained GloVe \cite{pennington2014glove} embeddings of dimension 300. 
+    \item \textbf{Entity embeddings} Using 500 dimensional RDF2Vec \cite{ristoski2016rdf2vec} embeddings to embed entities in the context of the entity mention and a section from the Wikipedia page of the entity, then compute the document vector using the TF-IDF of an an entity in context of the entity mention and its embedding.
+    \item \textbf{Term overlap} Number of shared words after tokenization.
+    \item \textbf{Size} a context-independent feature, which is the numbers of words in an entity aspect's text.
+\end{enumerate}
+
+Furthermore, they explore different context sizes, sentence, paragraph, and section.
+
+
+% \textbf{TF-IDF.} Cosine similarity between the TF-IDF (logarithmic, L2-normalized) vector of contextual mention and aspect.
+
+% \textbf{BM25.} Rank aspect representations using the contextual mention as a query using BM25 ($k_1=2, b=0.75)$.
+
+% \textbf{Word Embeddings.} Cosine similarity between the mention in context and
+% the aspect using pre-trained GloVe \cite{pennington2014glove} embeddings of dimension 300. 
+
+% \textbf{Entity Embeddings.} Use 500 dimensional RDF2Vec \cite{ristoski2016rdf2vec} embeddings to embed entities in the context of the entity mention and a section from the Wikipedia page of the entity, then compute
+% the document vector using the TF-IDF of an an entity in context of the entity mention and its embedding.
+
 
 
 

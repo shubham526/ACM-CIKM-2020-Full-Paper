@@ -1,33 +1,32 @@
 
 \section{Evaluation}
 \label{sec:Evaluation}
-In this section, a quantitative evaluation of our system is presented on the entity-aspect dataset from Nanni et al.\cite{nanni2018entity}. We begin by presenting some research questions pertaining to three broad components of our system: Entity Salience, Entity Relatedness and Co-occurring entities, which our experiments aim to address(Section \ref{subsec:Research Questions}). We then describe our experimental settings (Section \ref{subsec:Evaluation Paradigm}), followed by the baselines (Section \ref{subsec:Baselines}). We end this section with a discussion of our experiments and results (Section \ref{subsec:Results}).
+In this section, a quantitative evaluation of our system is presented on the entity-aspect dataset from Nanni et al.\cite{nanni2018entity}. We begin by presenting some research questions pertaining to three broad components of our system: Entity Salience, Entity Relatedness and Co-occurring entities, which our experiments aim to address(Section \ref{subsec:Research Questions}). We then describe our experimental settings (Section \ref{subsec:Evaluation Paradigm}), followed by the baselines (Section \ref{subsec:Reproduction of Baselines}). We end this section with a discussion of our experiments and results (Sections \ref{subsec:Results} through \ref{subsec:Frequency vs Relatedness}).
 
 \subsection{Research Questions}
 \label{subsec:Research Questions}
 
 \begin{itemize}
 \item[\textbf{RQ1}] To which extent can  entity salience help EAL?
-\item[\textbf{RQ3}] \ld{Fix RQ numbering} To which extent are we predicting helpful entities?
-\item[\textbf{RQ2}] To which extent can the prominence score and entity relatedness help EAL?
-\item[\textbf{RQ4}] To which extent can joint aspect linking and aspect-to-aspect similarity help EAL?
+\item[\textbf{RQ2}] To which extent can entity relatedness help EAL?
+\item[\textbf{RQ3}] Is the frequency of relatedness of co-occurring entities a better indicator of aspects? 
+\item[\textbf{RQ4}] To which extent are we predicting helpful entities?
 \end{itemize}
 
 \subsection{Evaluation Paradigm}
 \label{subsec:Evaluation Paradigm}
 
-\textbf{Datasets.} Due to the lack of other datasets in this area, we use the Entity Aspect Linking dataset from Nanni et al.\cite{nanni2018entity}. It consists of 201 entity mentions from Wikipedia along with their sentence, paragraph and section context and a list of candidate aspects for the mention. We use this dataset for training a L2R algorithm using 5-fold cross validation. 
+\paragraph{\textbf{EAL Benchmark.}} Due to the lack of other datasets in this area, we use the Entity Aspect Linking dataset from Nanni et al.\cite{nanni2018entity}. It consists of 201 entity mentions from Wikipedia along with their sentence, paragraph and section context and a list of candidate aspects for the mention.   We use this dataset for training a Learning-to-rank (L2R) algorithm using 5-fold cross validation. 
 
-We use the TREC Complex Answer Retrieval (CAR) track \cite{dietz2018trec}\footnote{\url{http://trec-car.cs.unh.edu}} dataset as a source of passages when determining the prominence score in Section \ref{subsubsec:Co-occurring entities with an entity from context}. It consists of an entity linked corpus consisting of paragraphs from the entire English Wikipedia. We construct a Lucene index of passages and use the top 100 passages retrieved using the entity name as the query.
-
-Since neural networks require large training data to perform well and the dataset from Nanni et al. \cite{nanni2018entity} contains only 201 entity mention, we construct our own training data of 1,400 training data from the \textit{AllButBenchmark} resourse from TREC CAR (omitting pages Nanni's dataset). \textit{AllButBenchmark} consists of nearly all Wikipedia pages (omitting CAR benchmarks). We follow a similar construction as Nanni, deriving ground truth from entity links to top-level sections. We include section links within one page, but remove links to administrative sections such as ``References'', ``See Also'', etc. % \ld{drop?:}  (all pages and all sections on those pages along with the images embedded on the page), except for pages which were included in the official evaluation topics for years during which the track was active at TREC. 
-%
-%Our new training data consists of 1,400 examples extracted from the page data in \textit{AllButBenchmark}. It was constructed by retaining entity links within Wikipedia pages that link to top-level sections in other Wikipedia pages, after filtering out for administrative sections such as ``References'', ``See Also'', etc. We did not filter out self-referential links (a link to another section in the same page). The dataset is modelled after Nanni et al.\cite{nanni2018entity}. 
-Each training example contains the sentence context, paragraph context, entity mention and candidate aspects. %The candidate aspects are the top level sections of the Wikipedia page of the entity linked to the mention. 
+Nanni derived this dataset of aspect link examples from hyperlinks on Wikipedia pages that refer to sections on other pages.  It omits hyperlinks to administrative sections such as ``References'', ``See Also'', etc. Each training example contains the sentence context, paragraph context, entity mention and candidate aspects. The candidate aspects are the top level sections of the Wikipedia page of the entity linked to the mention. 
 Each candidate aspect contains information about its section header, text, and entities that are contained within it.
 
+The data sets contains entity links from hyperlinks to other Wikipedia pages (in both context and aspect content). In addition, we use WAT \cite{piccinno2014wat} to annotate additional entity links the context and aspect content.
 
-\textbf{Entity Linking.} Both data sets contain the entities from hyperlinks to Wikipedia pages in both context and aspect content. In addition, we use WAT \cite{piccinno2014wat} to annotate additional entity links the context and aspect content.
+
+\paragraph{\textbf{Passage Corpus.}}
+We use the TREC Complex Answer Retrieval (CAR) track \cite{dietz2018trec}\footnote{\url{http://trec-car.cs.unh.edu}} dataset as a source of passages when determining the prominence score in Section \ref{subsubsec:Co-occurring entities with an entity from context}. It consists of an entity linked corpus consisting of paragraphs from the entire English Wikipedia. We construct a Lucene index of passages and use the top 100 passages retrieved using the entity name as the query.
+
 
 %For each example in which an entity in a paragraph links to a section in a page, the candidate aspects for the example are the top level sections where the ground truth is the section that was linked to. Each example contains the sentence context, paragraph context and entity mention that contains the link to a different section. Each candidate represents a section, and contains information about its section header, text, and entities that are contained within it.
     
@@ -35,17 +34,21 @@ Each candidate aspect contains information about its section header, text, and e
     
 
 
-\textbf{Evaluation ground truth.} We use dataset from Nanni et al. \cite{nanni2018entity} for evaluation. It contains contexts, entity links to targets, and the correct aspect. His dataset was automatically created and manually verified. %The TREC Complex Answer Retrieval track \cite{dietz2018trec} dataset contains both passage and entity ground truth data. 
+\paragraph{\textbf{Evaluation ground truth.}}
+We use dataset from Nanni et al. \cite{nanni2018entity} for evaluation. It contains contexts, entity links to targets, and the correct aspect. His dataset was automatically created and manually verified. %The TREC Complex Answer Retrieval track \cite{dietz2018trec} dataset contains both passage and entity ground truth data. 
 %
 %LD I remove this, because it is only training data and it is described above
 %The ground truth for our new training data was constructed in a similar way: the true aspect of an entity mention is the top-level section on the Wikipedia page of the entity linked to the mention and in which the mention appears.
 
-\textbf{Evaluation Metrics.} Our methods predict a ranking of aspects. We use Precision at 1 (P@1) and Mean Reciprocal Rank (MRR) as our evaluation metrics. If the correct aspect is found at rank $r$, MRR score is $\frac{1}{r}$. Since there is only one correct aspect, MRR and mean-average precision are identical.
+\paragraph{\textbf{Evaluation Metrics.}}
+Our methods predict a ranking of aspects. We use Precision at 1 (P@1) and Mean Reciprocal Rank (MRR) as our evaluation metrics. If the correct aspect is found at rank $r$, MRR score is $\frac{1}{r}$. Since there is only one correct aspect, MRR and mean-average precision are identical.
 
 
-\textbf{Entity Salience Detection.} We use SWAT \cite{swat}  to determine the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages in Figure \ref{fig:Salience}, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
+\paragraph{\textbf{Entity Salience Detection.}}
+We use SWAT \cite{swat}  to determine the salience of an entity in text. Given some text, SWAT outputs the entities along with their salience scores in the text. For example, using the online demo \footnote{https://swat.d4science.org/}, given the two passages in Figure \ref{fig:Salience}, SWAT correctly predicts \textit{Boris Johnson} as salient in Passage 2 (Score = 0.6), and non-salient in Passage 1 (Score = 0.15). 
 
-\textbf{Entity Relatedness Detection.}  We use the Entity Relatedness system from WAT \cite{piccinno2014wat} to find relatedness between pairs of entities. Given a list of entities, WAT provides the relatedness measure between every pair of entities in the list. For example, given the entity list consisting of \textit{Boris Johnson}, \textit{Theresa May} and \textit{Donald Trump}, WAT predicts the relatedness between every pair of entities as follows:
+\paragraph{\textbf{Entity Relatedness Detection.}}
+We use the Entity Relatedness system from WAT \cite{piccinno2014wat} to find relatedness between pairs of entities. Given a list of entities, WAT provides the relatedness measure between every pair of entities in the list. For example, given the entity list consisting of \textit{Boris Johnson}, \textit{Theresa May} and \textit{Donald Trump}, WAT predicts the relatedness between every pair of entities as follows:
 \begin{quote}
     (\text{Boris Johnson}, \text{Donald Trump}) = 0.37, \\
     (\text{Theresa May},\text{Donald Trump})    = 0.38, \\
@@ -53,23 +56,30 @@ Each candidate aspect contains information about its section header, text, and e
 \end{quote}
 Nanni et al. \cite{nanni2018entity} use RDF2Vec \cite{ristoski2016rdf2vec} to find relatedness between entities. However, in our experiments, we found that the relatedness system from WAT outperforms RDF2Vec.
 
-\textbf{Machine Learning.}
+\paragraph{\textbf{Machine Learning.}}
 We apply our methods to produce an aspect ranking for every entity mention. We then treat each ranking as a feature and perform 5-fold cross validation with a listwise learning-to-rank (L2R) method (Coordinate Ascent) optimized for Precision at 1 (P@1). We use RankLib\footnote{Dang, V. "The Lemur Project-Wiki-RankLib." Lemur Project,[Online]. Available: \url{http://sourceforge. net/p/lemur/wiki/RankLib}.} for this purpose. 
 
-\ld{Jordan's stuff...}
-%\textbf{Neural Methods.}
-%We evaluate the Logistic Network, BiLSTM network, and Global Context Separately, as well as together with respect to joint optimization. 
 
-We train the joint-aspect model with respect to binary cross-entropy, using the Adam optimizer from the PyTorch library. 
-%We use samples from the 88k dataset, and then evaluate with respect to the samples in Nanni et al.'s dataset. We report P@1 and MAP statistics for each method. 
-\ld{this needs to into the section for RQ-joint-aspect}
-The \textbf{just-logistic, just-bi,} and \textbf{just-global} methods are with respect to evaluation using only the logistic network, BiLSTM network, and \ld{update:} global context network respectively. The \textbf{joint-network} method consists of all three networks, the parameters of which are trained simultaneously.
+
+\paragraph{\textbf{Feature Subsets}}
+We present an ablation study with various subsets of features. Below, we define the feature subsets we use in our study.
+
+\begin{itemize}
+    \item \textbf{Subset-1.} All features based on entity relatedness.
+    \item \textbf{Subset-2.} All features based on entity salience.
+    \item \textbf{Subset-3.} All features based on entity relatedness along with lexical and semantic features from Nanni et al \cite{nanni2018entity}.
+    \item \textbf{Subset-4.} All features based on entity salience along with lexical and semantic features from Nanni et al \cite{nanni2018entity}.
+    \item \textbf{Subset-5.} All features based on entity relatedness and entity salience along with lexical and semantic features from Nanni et al \cite{nanni2018entity}.
+    
+    
+\end{itemize}
 
 \subsection{Reproduction of Baselines}
-\label{subsec:Baselines}
-\label{subsubsec:Reproduction of Nanni et al}
+\label{subsec:Reproduction of Baselines}
+
 We use two baselines from Nanni et al.
 
+\noindent
 \textbf{Baseline 1: Nanni's method} We re-implement all features from Nanni et al. \cite{nanni2018entity} and use a supervised combination of sentence, paragraph and section context features as our baselines. \\
 \textbf{Baseline 2: Size.} We consider the length of each section (in number of tokens) and link the entity-mention to the longest. \\
 %\textbf{Baseline 3: Content Overlap.} Overlap between the tokens in the sentence, paragraph and section context of the mention. \\
@@ -77,22 +87,24 @@ We use two baselines from Nanni et al.
 
 %\subsubsection{Reproduction of Nanni's Approach.}
 
-in Table \ref{tab:Reproducible-results} we compare the results of our features to that of the original authors', we note a minor discrepancy, which is mostly within standard error. This is likely due to differing corpus statistics or tokenization choices. This highlights in attempting to exactly reproduce previous results, however we consider our results close enough for the purpose of comparison. Since the joint-aspect method relies on logistic regression, which is known to produce slightly worse results, we provide results of features from Nanni et al, which is trained with a logistic regression model.
+In Table \ref{tab:Reproducible-results}, we compare the results of our features to that of the original authors', we note a minor discrepancy, which is mostly within standard error. This is likely due to differing corpus statistics or tokenization choices; however we consider our results close enough for the purpose of comparison. 
+
+%Since the joint-aspect method relies on logistic regression, which is known to produce slightly worse results, we provide results of features from Nanni et al, which is trained with a logistic regression model.
 
 \subsection{Overall Results}
 \label{subsec:Results}
-The most interesting results are presented in Table \ref{tab:Results}. Due to space constraints other results were moved to the online appendix for this paper. Below, we discuss each of the research questions presented in Section \ref{subsec:Research Questions}.
+The most interesting results are presented in Table \ref{tab:Results-shubham}. Due to space constraints other results were moved to the online appendix for this paper. Below, we discuss each of the research questions presented in Section \ref{subsec:Research Questions}.
 %Below, we discuss results from our experiments with respect to the three broad components of our system: entity salience, entity relatedness and co-occurring entities, and answer the research questions presented in Section \ref{subsec:Research Questions}.
 
 
-\begin{figure}
+\begin{figure}[t]
     \centering
-    \includegraphics [scale=0.5]{plot-cropped.png}
+    \includegraphics [width=1\columnwidth]{plot-cropped.png}
     \caption{Difficulty-test for P@1, comparing Nanni et al.(Sentence) to various L2R systems.}
     \label{fig:difficulty-plot}
 \end{figure}
 
-\begin{table}[]
+\begin{table}[t]
 \caption{Performance of individual entity rankings (in terms of MAP) on different contexts obtained using frequency and relatedness and combined with L2R.}
 \label{tab:Results-Entity-Rankings-Freq-And-Rel}
 \begin{tabular}{@{}llll@{}}
@@ -107,7 +119,7 @@ L2R         & 0.01     & 0.02      & 0.03   \\
 
 
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Performance of individual entity rankings (in terms of MAP) on different contexts obtained using entity salience and combined with L2R.}
 \label{tab:Results-Entity-Rankings-Sal}
 \begin{tabular}{@{}llll@{}}
@@ -119,34 +131,37 @@ Context-All-Content-Salient     & 0.006    & 0.008     & 0.003   \\
 Context-All-Content-All         & 0.02     & 0.02      & 0.01    \\ \midrule
 L2R                             & 0.006    & 0.009     & 0.005   \\ \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
-\begin{table}[t]
+\begin{table*}[t]
 \caption{Helps-Hurts analysis for frequency versus relatedness.}
 \label{tab:Helps-Hurts-Analysis}
-\begin{tabular}{|l|c|c|c|c|c|c|}
-\hline
-                                & \multicolumn{6}{c|}{Relatedness}                                                              \\ \hline
-                                & \multicolumn{2}{c|}{Sentence} & \multicolumn{2}{c|}{Paragraph} & \multicolumn{2}{c|}{Section} \\ \hline
-                                & Helps         & Hurts         & Helps          & Hurts         & Helps         & Hurts        \\ \hline
-\multicolumn{1}{|c|}{Frequency} & 679           & 15            & 1018           & 9             & 1160          & 3            \\ \hline
+\begin{tabular}{lcccccc}
+\toprule
+                                & \multicolumn{6}{c}{Relatedness}                                                              \\ 
+                                & \multicolumn{2}{c}{Sentence} & \multicolumn{2}{c}{Paragraph} & \multicolumn{2}{c}{Section} \\ 
+                                & Helps         & Hurts         & Helps          & Hurts         & Helps         & Hurts        \\ 
+\midrule
+\multicolumn{1}{c}{Frequency} & 679           & 15            & 1018           & 9             & 1160          & 3            \\ 
+\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \begin{table*}[t]
 \caption{Results from Nanni et al.\cite{nanni2018entity} and from our implementation of their methods.}
 \label{tab:Reproducible-results}
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-                          &               &               &                &               &               &               \\ \hline
-                          & \multicolumn{2}{c|}{Sentence} & \multicolumn{2}{c|}{Paragraph} & \multicolumn{2}{c|}{Section}  \\ \hline
-                          & P@1           & MRR           & P@1            & MRR           & P@1           & MRR           \\ \hline
-Original (from the paper) & 0.70$\pm$0.03 & 0.81$\pm$0.02 & 0.65$\pm$0.03  & 0.78$\pm$0.03 & 0.57$\pm$0.03 & 0.73$\pm$0.03 \\ \hline
-Re-implemented (L2R)            & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ \hline Re-implemented (Logistic)            &0.63$\pm$0.04 & 0.77$\pm$0.03 & 0.50$\pm$0.03  & 0.67$\pm$0.03 & -- & -- \\\hline
+\begin{tabular}{ccccccc}
+\toprule
+                          & \multicolumn{2}{c}{Sentence} & \multicolumn{2}{c}{Paragraph} & \multicolumn{2}{c}{Section}  \\ \hline
+                          & P@1           & MRR           & P@1            & MRR           & P@1           & MRR           \\
+\midrule
+Original (from the paper) & 0.70$\pm$0.03 & 0.81$\pm$0.02 & 0.65$\pm$0.03  & 0.78$\pm$0.03 & 0.57$\pm$0.03 & 0.73$\pm$0.03 \\ 
+Re-implemented (L2R)      & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03  & 0.78$\pm$0.03 & 0.53$\pm$0.03 & 0.71$\pm$0.03 \\ 
+\bottomrule
 \end{tabular}
 \end{table*}
 
-\begin{table}[t]
+\begin{table*}[t]
     \caption{Performance with standard error of individual entity salience and relatedness features and combined with L2R, including subsets/ablations.}
     \label{tab:Results-shubham}
     %\scalebox{0.9}{
@@ -286,9 +301,9 @@ Re-implemented (L2R)            & 0.67$\pm$0.03 & 0.79$\pm$0.02 & 0.64$\pm$0.03 
        \bottomrule
     \end{tabular}
     %}
-\end{table}
+\end{table*}
 
-\todo{Jordan: Add your results to another table here.}
+
 
 
 

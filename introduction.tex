@@ -11,11 +11,13 @@ pandemic in which she analyzes the different angles of the pandemic on the econo
 \input{intro-example}
 
 
-For such support systems, entity linking tools \cite{ferragina2010tagme,mendes2011dbpedia,piccinno2014wat} identify and disambiguate entity mentions, such as of the entity Coronavirus Disease 2019. However, the resulting entity links do not differentiate between different aspects of the entity that are being discussed. The journalist in the motivating example would be best helped with a fine-grained extension of entity links---we call this task entity aspect linking. Given a catalog of aspects for each entity, entity aspect linking predicts for each entity, which of its aspects is referenced in the context. 
+For such support systems, entity linking tools \cite{ferragina2010tagme,mendes2011dbpedia,piccinno2014wat} identify and disambiguate entity mentions, such as of the entity ``Coronavirus Disease 2019.'' However, the resulting entity links do not differentiate between different aspects of the entity that are being discussed. The journalist in the motivating example would be best helped with a fine-grained extension of entity links---we call this task entity aspect linking. Given a catalog of aspects for each entity, entity aspect linking predicts for each entity, which of its aspects is referenced in the context. 
 
- Figure \ref{fig:introexample} lists the most relevant entity aspects for the entities mentioned in the text above.  In this example, the catalog of entity aspects is derived from sections in the Wikipedia article of the mentioned entity---other sources for aspect catalogs can be a reputation management platform or journalistic notes, as long as a brief description of each aspect is available. We call this description as \emph{aspect-content}.  
- %
+ Figure \ref{fig:introexample} lists the most relevant entity aspects for the entities mentioned in the text above.  In this example, the catalog of entity aspects is derived from sections in the Wikipedia article of the mentioned entity---other sources for aspect catalogs can be a reputation management platform or journalistic notes, as long as a brief description of each aspect is available. We refer to this description as \emph{aspect content}.  
+ 
  For very popular topics such as COVID-19, aspect prediction can be addressed with lexicalized text classification. However, our goal is to develop a support system that also works for less popular topics, where the manual annotation of training data would defeat the purpose. 
+
+Finally, the benefits of an entity-aspect-linker go much beyond classifying into different aspects of a single target entity (such as COVID-19). While knowledge graphs have shown a lot of advantages, entity aspect linking allows to build a sub-entity knowledge graph, where nodes represent entity aspects, which are grouped into entities. Because the aspects are associated with content that mentions other entities, we can establish relations between entity-aspects by entity-aspect-linking the content of aspects.
 
 
 %\ld{Shubham delete when ok. Deleted Paragraph. I am not a fan of jobs and apple. If you later need an example to explain entity linking you can move it there -- in the introduction I would focus on stuff that's not very well known.}
@@ -26,10 +28,11 @@ For such support systems, entity linking tools \cite{ferragina2010tagme,mendes20
 %\ld{Merged paragraphs below.}
 % Current entity linking tools \cite{ferragina2010tagme,mendes2011dbpedia,piccinno2014wat} can correctly identify and disambiguate entities in text. However, they cannot infer the correct \textit{aspect} of the entity from the context. For example, given the sentence, \textit{Boris Johnson is back after recovering from COVID-19}, an entity linking tool can correctly disambiguate and link the mention \textit{Boris Johnson} to its knowledge base entry but cannot infer whether the mention refers to his role as a \textit{Writer at the Daily Telegraph} or as the \textit{Prime Minister of the UK}. In general, an entity mention may be related to several different events, roles, and topics. We refer to each of them as an \textit{Entity Aspect}. 
 
-\noindent We propose a new method for the following task statement:
+\noindent In this work we focus on improving entity aspect linking:
+
 \paragraph{\textbf{Entity Aspect Linking Task.}} Given a mention $M_E$ for entity $E$ in a context $C$ such a tweet, sentence or paragraph and a set of $n$ predefined aspects $A_{E} = \{A_1, A_2, A_3, \cdots, A_n\}$ along with their contents, link the mention $M_E$ to an aspect $A_i \in A_{E}$ that best captures the addressed topic. 
 
-%\bigskip
+\bigskip
 %\ld{TODO! I keep on referring to context and content, I think we need a figure for that.}
 In the following we distinguish between context and content: the context is the text surrounding the entity mention we seek to aspect-link. With content, we refer to content associated with the aspect. This is depicted in Figure \ref{fig:context-vs-content}.
 
@@ -52,14 +55,15 @@ In this work, we explore to which extent salience detection can avoid false posi
 Several entity relatedness measures have been suggested \cite{ristoski2016rdf2vec, ruback2018computing, zeng2019measuring, ponza2017two}. Entity relatedness measures predict the similarity between two entities. We explore if entity relatedness is helpful to link contexts to aspect content whenever they are not mentioning the same entities, but entities that are highly related.
 Available entity relatedness tools \cite{piccinno2014wat} are pre-trained from knowledge graphs and do not take the context of the entity mention into account. Nevertheless, we believe that a static entity-relatedness measure will provide robust background knowledge when integrated with indicators from context and content.
 
-The success of modern entity linking tools lies in the integration of contextual entities and their relations in the prediction process \cite{ratinov-etal-2011-local, ferragina2010tagme, hoffart2011robust}. In this paper we incorporate this idea into Entity Aspect Linking: after predicting the aspect-links of entities in the context, we use aspect-to-aspect similarity indicators to improve the aspect linking result of a selected mention. While knowledge graphs naturally provide relations between entities, they are not suitable for describing the relations between entity aspects. Therefore, we explore aspect-to-aspect similarities based on headings, content, and entities. We utilize these similarities to infer the relevance of a particular mention given the context of the linked co-occurring entities.
+%The success of modern entity linking tools lies in the integration of contextual entities and their relations in the prediction process \cite{ratinov-etal-2011-local, ferragina2010tagme, hoffart2011robust}. In this paper we incorporate this idea into Entity Aspect Linking: after predicting the aspect-links of entities in the context, we use aspect-to-aspect similarity indicators to improve the aspect linking result of a selected mention. While knowledge graphs naturally provide relations between entities, they are not suitable for describing the relations between entity aspects. Therefore, we explore aspect-to-aspect similarities based on headings, content, and entities. We utilize these similarities to infer the relevance of a particular mention given the context of the linked co-occurring entities.
  
 Finally, we reproduce the implementation of Nanni et al.\ and explore several avenues for improvement.
 
 
 %Nanni et al. \cite{nanni2018entity} have shown that a supervised combination of various text and entity features based on embeddings of the words and entities from various sources (context of mention, content of Wikipedia page of the mention, etc) is able to correctly predict aspects in 70\% of the cases. In this work, we build on their work and use entity salience and relatedness based features in supervised setting with some lexical and semantic features used in \cite{nanni2018entity} and show that this leads to significant improvements in results on the task.
 
-\paragraph{\textbf{Contributions.}} 
+%\noindent \paragraph{\textbf{Contributions.}} 
+\subsection{Contributions}
 
 %This paper studies the role of entity salience and relatedness on the aspect linking task. We study how these indicators can help and under what conditions they work. We show that using these indicators alone may not be useful but a supervised combination of salience and relatedness based features along with some lexical and semantic features outperforms the current state-of-the-art on the task. We also study the effect of using the frequency and relatedness 
 %contextual entities on the task.
@@ -72,11 +76,12 @@ Our contributions are as follows.
     %\item We show that although entity salience and entity relatedness can work on their own, a supervised combination of these indicators along with some lexical and semantic features can outperform several baselines and the current state-of-the-art on the task to achieve better results.
     \item We study the benefits of entity salience detection in weighting contextual entities by their importance for the aspect linking decision. 
     \item We incorporate static entity relatedness measures as well as co-occurrence statistics in the entity aspect linking method.
-    \item We explore to which extent aspect-to-aspect similarity can be trained and exploited to improve the quality of aspect links. \ld{Jordan: expand/rephrase -- or delete once done}
-    \item We analyze the utility of sequence models such as bi-LSTMS with ELMo embeddings in contrast to simple bag-of-words models.
     \item We present a detailed study and analysis of the conditions under which these indicators work versus do not work. 
     \item We offer a reproduction and re-implementation of the entity aspect linking method of Nanni et al. \cite{nanni2018entity}
 \end{itemize}
 
-\paragraph{\textbf{Outline.}} The remainder of this paper is organized as follows. Section \ref{sec:Related Work} discusses some related work on the topic. %Section \ref{sec:Background} gives the background information about various components of our approach.
-Section \ref{sec:Approach} presents our proposed method in detail. Section \ref{jordan-logistic} introduces the logistic model used in predicting aspect relevance, while Section \ref{jordan-lstm} uses a Bi-LSTM model to predict aspects embedded using ELMo. In Section \ref{jordan-co-entity}, we motivate the use of co-occuring entities in predicting the relevance of aspects in a joint learning model.  Section \ref{sec:Evaluation} presents a quantitative evaluation of our work. Finally, we conclude the paper with Section \ref{sec:Conclusion}.
+%\paragraph{\textbf{Outline.}}
+\subsection{Outline}
+
+The remainder of this paper is organized as follows. Section \ref{sec:Related Work} discusses some related work on the topic. Section \ref{sec:Background} gives a brief re-cap of the work by Nanni et al.\cite{nanni2018entity}.
+Section \ref{sec:Approach} presents our proposed method in detail. Section \ref{sec:Evaluation} presents a quantitative evaluation of our work. Finally, we conclude the paper with Section \ref{sec:Conclusion}.

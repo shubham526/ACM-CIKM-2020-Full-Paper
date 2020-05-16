@@ -1,28 +1,24 @@
 
 \section{Related Work}
 \label{sec:Related Work}
+We provide a brief overview of related work on entity linking, the use of Wikipedia sections for fine-grained annotations, and co-occurrence analysis in passages.
 
-\textbf{Entity Linking.}
+\subsection{Entity Linking}
 The task of Entity Linking is to link the mention of an entity in text to a knowledge base entry. Several entity linking systems exist such as TagMe \cite{ferragina2010tagme}, DBPedia Spotlight \cite{mendes2011dbpedia}, Babelfy \cite{babelfy} and WAT \cite{piccinno2014wat}. All these systems examine the context around the entity to disambiguate the entity mention. 
 For example, in the sentence \textit{Steve Jobs founded Apple}, the system would predict from the context that the mention \textit{Apple} refers to the company but in the sentence \textit{The apple fell on Newton's head}, the mention \textit{apple} refers to the fruit. 
 More recently, systems have been developed to produce embeddings of entities from text and knowledge graphs \cite{huang2015leveraging,ristoski2016rdf2vec,yamada2016joint} and for entity disambiguation and linking \cite{yamada2017learning}. 
 
 In this work, we aim to further enrich an entity link with the correct aspect of the entity mention in the text. We treat the sections from the Wikipedia page of the entity mention as different aspects of the entity and given an entity mention along with the sentence, paragraph and section context, try to link it to the correct section (that is, aspect).
 
-% zeng2019measuring : Measuring Entity Relatedness via Entity and Text Joint Embedding : Really well written
-% durrett2014joint : A joint model for entity analysis: Coreference, typing, and linking
-% zhao2019leveraging : Leveraging Context Information for Joint Entity and Relation Linking
-% nguyen2016joint : Joint learning of local and global features for entity linking via neural networks
-% le2018improving : Improving entity linking by modeling latent relations between mentions
-\textbf{Joint Entity Linking.} In this paper, we consider the use of contextual information from co-occuring entities to aid in linking aspects.
+%\textbf{Joint Entity Linking.} In this paper, we consider the use of contextual information from co-occuring entities to aid in linking aspects.
 
-Durret et al. \cite{durrett2014joint} approach joint entity linking by simultaneously trying to resolve a named entity recognition, entity linking, and co-reference resolution problem. Their joint model uses a structured conditional random field, the context consisting of extracted mentions and text of the document to be linked. In contrast, we take the approach of jointly modeling the relevance of mentions to candidate aspects.
+%Durret et al. \cite{durrett2014joint} approach joint entity linking by simultaneously trying to resolve a named entity recognition, entity linking, and co-reference resolution problem. Their joint model uses a structured conditional random field, the context consisting of extracted mentions and text of the document to be linked. In contrast, we take the approach of jointly modeling the relevance of mentions to candidate aspects.
 
-Nguyen et al. \cite{nguyen2016joint} embed mentions and candidate entities using a Convolutional Neural Network (CNN). Their joint model arises from a sum of local features, which measure the similarity between embedded mentions and candidate entities, and of global features, which are based on the entire collection of mentions and candidate entities in the document.
+%Nguyen et al. \cite{nguyen2016joint} embed mentions and candidate entities using a Convolutional Neural Network (CNN). Their joint model arises from a sum of local features, which measure the similarity between embedded mentions and candidate entities, and of global features, which are based on the entire collection of mentions and candidate entities in the document.
 
-Chen Liu et al. \cite{liu2019attention} also use a CNN to embed candidate candidate entities and mentions. They first link the most likely candidates to mentions based on a local measure of relevance. They then use an attention mechanism to determine the most likely candidate for each mention based on these links. While our method is similar, we not only use the highest linked candidate for each mention, but also all candidates and their associated measures of relevance, to infer a global context.
+%Chen Liu et al. \cite{liu2019attention} also use a CNN to embed candidate candidate entities and mentions. They first link the most likely candidates to mentions based on a local measure of relevance. They then use an attention mechanism to determine the most likely candidate for each mention based on these links. While our method is similar, we not only use the highest linked candidate for each mention, but also all candidates and their associated measures of relevance, to infer a global context.
 
-\textbf{Entity Aspect Linking using Sections.} 
+\subsection{Entity Aspect Linking using Sections} 
 The following works try to map entities or passages to Wikipedia sections, similar to how we want to map an entity to a Wikipedia section.
 
 Fetahu et al. \cite{fetahu2015automated} enrich Wikipedia sections with news-article references in two steps: First, they suggest news articles to Wikipedia entities (article-entity placement step) and Second, they find the exact section in the entity page where the article must be placed (article-section placement step).
@@ -39,7 +35,7 @@ In their work, they present a learning-to-rank based method which uses both lexi
 
 In our work, we adopt the same definition of aspects as Nanni  et al. \cite{nanni2018entity} and use their dataset. However, we consider the role of entity salience and relatedness and show that a supervised combination of lexical and semantic features with salience and relatedness features achieves state-of-the-art results.
 
-\textbf{Using Co-occurring Entities}
+\subsection{Using Co-occurring Entities}
 The following works use entities which co-occur with a given entity in two different tasks and show their effectiveness on the task. 
 
 Dalton et al. \cite{dalton2014entity} present the Entity Context Model (ECM) in their work on Entity Query Feature Expansion. They use the ECM to derive a distribution over words in the context of an entity and co-occurring entities with the entity.

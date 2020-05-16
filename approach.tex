@@ -1,28 +1,23 @@
 \section{Approach}
 \label{sec:Approach}
-Our goal is to enrich entity links with fine-grained aspects of the entities. In this work, we consider whether a static measure of entity salience and relatedness which has not been trained for this task can help. We further explore to which extent aspect-to-aspect similarities can further improve the results in a joint-aspect-linking approach that is reminiscent to joint entity linking.  We refer to the entity that we want to link to the correct aspect link as the \emph{target entity}. In the following, we discuss several ideas as micro-approaches. In the evaluation, we will compare them on their own, and through a supervised combination that uses each as a feature.
+Our goal is to enrich entity links with fine-grained aspects of the entities. In this work, we consider whether a static measure of entity salience and relatedness which has not been trained for this task can help.  We refer to the entity that we want to link to the correct aspect link as the \emph{target entity}. In the following, we discuss several ideas as micro-approaches. In the evaluation, we will compare them on their own, and through a supervised combination that uses each as a feature.
 
 %\ld{We should prepare the reader in terms of why we are defining features. Maybe with a sentence like this "In the following we discuss several ideas a micro-approaches. In the evaluation we will compare them on their own, an through a supervised combination that uses each as a feature. }
 
 
 %To study the role of entity salience, entity relatedness and co-occurring entities, we describe below several ranking strategies based on these and later combine them in a learning-to-rank system. In all our discussions, we refer to the entity that we are trying to aspect link as the target entity.
 
-\subsection{Reproduction of Nanni Et Al.}
+\subsection{Reproduction of Nanni's Method}
 
-We reimplemented Nanni et al's features as described in background. We explore three machine methods for combining these features, Learning to Rank, Logisitc Network
+We reimplemented Nanni et al's features as described in background. We will include a reproducibility study on his method. Furthermore, these are the basis of our approach in comparison to which we evaluate the utility of entity saliency and entity relatedness.
 
-Additional we further include a \ld{todo, motivate and describe here} BiLSTM feature. \ld{also explain that we are using elmo}
+%Additional we further include a \ld{todo, motivate and describe here} BiLSTM feature. \ld{also explain that we are using elmo}
 
 
 % \subsection{Neural Methods.}
 % We use the PyTorch library \cite{pytorch} to construct our neural networks. There are three neural networks that we consider both independently, and together in a joint model. 
 
-\subsubsection{Entity Aspect Relevance \ld{demoted in level, because there should only be four subsections}}
-In this paper we model the relevance of an entity aspect with respect to an entity mention using the features described in Section \ref{entity-aspect-representation}. We learn a linear combination of these features using a simple logistic network, trained with respect to binary cross entropy.
 
-We also consider a second representation of entity aspect relevance using a Bi-LSTM model, wherein we embed each sentence in a segment of text using ELMo \cite{elmo}. ELMos is a contextual language embedding model that takes as input a sentence, and outputs word embeddings that depend upon the context given by the sentence. Each word embedding consists of three vectors, and in this paper we concatenate these vectors together to obtain a final word embedding. We then average all of the word embeddings in a sentence together to obtain the embedding of a sentence. These embeddings are used as sequential inputs in a BiLSTM. We embed both the paragraph context of an entity's mention and the text of each candidate entity aspect. (number of hidden layers to be determined ...)
-
- 
 \subsection{Entity Salience for Aspect Linking}
 \label{subsec:Entity Salience for Aspect Linking}
 Our first extension is to incorporate indicators from entity salience detection.
@@ -168,50 +163,7 @@ Instead of ranking aspects $a$ by a sum of prominence/relatedness scores that th
 
 
 
- \subsection{Joint Aspect Linking}\label{jordan-co-entity}
-In relation to joint entity linking, we can produce aspect links for contextual entities $e$, then use an aspect-to-aspect similarity function to improve the aspect link prediction for the target entity $e_T$. One advantage of this approach is that it provides a more specific context in which to compare two entities. For example, consider a sentence like ``Make sure that you keep chocolate away from your dogs.'' There is no indication that this has anything to do with health, but if we first linked the ``Dogs'' entity mention, we would see that the content of the ``Health'' aspect explicitly discusses the danger of Theobromine poisoning from chocolate, and this is the only context in which chocolate is discussed on the Wikipedia page of  ``Dogs''. It becomes apparent that the relevant aspect in Chocolate is ``Health effects'', because it discusses Theobromine poisoning. Had we instead linked the ``Chocolate'' entity mention without using contextual entities, then a section that mentions the word ``chocolate'' multiple times may have been the most likely candidate for aspect linking. In the following we describe an approach to take advantage of this kind of reasoning.
-
-%\ld{refer back to entity relatedness section, but please don't bash the other part of this work. I usually phrase it as a hypothesis. We conjecture that ... -- be careful that each of these hypotheses is followed up with experimental evidence}
-
-%\ld{Just because entities are contained in the context, does not mean that they are relevant for linking the aspect}
-
-For the majority of contextial entities $e$, we we do not have access to the ground truth aspect in our benchmark. Nevertheless supervised learning is possible: We can apply a preliminary aspect linker to contextual entities, and then use their linked aspects as a potential indicator for determining the correct aspect to link to the target entity.
-In this paper, we use context-specific features to score the relevance of aspects contained in contextual entities.
-By using aspect-to-aspect similarity features, we can control how the relevance of aspects in the target entity are influenced by the relevance of aspects in contextual entities. 
-
-\subsubsection{Aspect-to-Aspect Similarities}
-We use the following aspect-to-aspect similarity functions to measure the similarity between aspects in contextual entities and aspects in the target entity.
-
-\textbf{Unigram Overlap.} The number of unigrams that overlap based on the text contained in each entity aspect.
-
-\textbf{Character n-gram Overlap.} We use a sliding window to generate character 4-grams from each entity aspect text, and the similarity between to entity aspects is respect to the overlap of these 4-grams.
-
-\textbf{Header Overlap.}
-We also use the Character n-gram Overlap method with respect to the section header of each entity aspect.
-
-\textbf{Entity Overlap.}
-Each entity aspect also contains a number of entity links within the main body of its text. We count the overlap of these entities with respect to two entity aspects.
-
-\textbf{Word2Vec Cosine Similarity.} 
-We embed the text of each entity aspect by using Word2Vec to generate word embeddings, and then we average these embeddings together. We measure the cosine similarity between two entities with respect to these embeddings.
-
-\smallskip
-
-\subsubsection{Joint Aspect Linking.}
-
-We score the relevance of an contextual entity aspect $a_{ij}$ for the target aspect $a$ using a supervised aspect-to-aspect similarity function $sim$, which combines the similarity features described above.  
-Let $a$ be an entity aspect, $E$ be the collection of co-entities for a given paragraph context, $A_i$ be the set of aspects of contextual entities $e_i$. By marginalizing over contextual entities and their aspects, we can score the aspect $a$ of the target entity $e_T$ in a context-specific manner.
-
-\begin{equation}
-P(a) = \frac{1}{E} \sum_{e_i  \in E}\sum_{a_ij \in A_{e_i}}  P(a_{ij} \vert e_i) \dot \text{sim}(a_{ij}, a) \cdot 
-\end{equation}
-
-\subsubsection{Supervised aspect-to-aspect similarity learning}
-We learn the supervised aspect-to-aspect similarity from low-level similarity feature functions $sim_k$, defined above. These are combined with a linear model using parameters $\lambda_k$. We use a pipeline training  paradigm, where we first train an non-joint aspect-linker $\tilde{P}(a_{ij} \vert e_i)$ on the set of features $\mathcal{F}$ detailed in Sections  \ref{sec:Approach}.1--\ref{subsubsec:Co-occurring entities with an entity from context}, which is used to determine contextual aspects as a probability distribution. In a separate step, we train the joint aspect linker $P(a \vert e_T)$ on a set of features that augments $\mathcal{F}$ with additional aspect-to-aspect features $\mathcal{A}$. To make the training efficient, we exploit the linearity of $\frac{1}{E}\sum_{e_i} \sum_{a_{ij}} \tilde{P}(a_{ij}|e_i) \sum_k sim_k(a,a_{ij}) \lambda_k = \sum_k \lambda_k \mathcal{A}_k$ to derive joint-aspect features as $\mathcal{A}_k=\frac{1}{E}\sum_{e_i} \sum_{a_{ij}} \tilde{P}(a_{ij}|e_i) sim_k(a,a_{ij})$.
-
-
-
-%\ld{make Shubam's $A$ lowercase $a$}
+ 
 
 
 \begin{comment}

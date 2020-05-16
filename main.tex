@@ -1,14 +1,14 @@
 %
 % The first command in your LaTeX source must be the \documentclass command.
-\documentclass[sigconf,authordraft]{acmart}
+\documentclass[sigconf,anonymous,review]{acmart}
 \usepackage{booktabs}
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{ragged2e}
 
  %activate todo's
-\newcommand{\ld}[1]{\textcolor{purple}{Laura: #1}}
-\newcommand{\todo}[1]{\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1!}}
+\newcommand{\ld}[1]{}% \textcolor{purple}{Laura: #1}}
+\newcommand{\todo}[1]{}%\textcolor{red}{TODO: #1}\PackageWarning{TODO:}{#1!}}
 % deactivate todos
 %\newcommand{\todo}[1]{ \PackageWarning{TODO:}{#1!}}
 
@@ -61,41 +61,67 @@
 % The "author" command and its associated commands are used to define the authors and their affiliations.
 % Of note is the shared affiliation of the first two authors, and the "authornote" and "authornotemark" commands
 % used to denote shared contribution to the research.
-\author{Shubham Chatterjee}
-\email{sc1242@cs.unh.edu}
+%\author{Shubham Chatterjee}
+%\email{sc1242@cs.unh.edu}
 %\orcid{1234-5678-9012}
-\affiliation{
- \institution{University of New Hampshire}
-  \city{Durham}
- \state{New Hampshire}
-}
-\author{Jordan Ramsdell}
-\email{jsc57@cs.unh.edu}
+%\affiliation{
+% \institution{University of New Hampshire}
+%  \city{Durham}
+% \state{New Hampshire}
+%}
+%\author{Jordan Ramsdell}
+%\email{jsc57@cs.unh.edu}
 %\orcid{1234-5678-9012}
-\affiliation{
- \institution{University of New Hampshire}
-  \city{Durham}
- \state{New Hampshire}
-}
-\author{Laura Dietz}
-\email{dietz@cs.unh.edu}
-\affiliation{
- \institution{University of New Hampshire}
-  \city{Durham}
- \state{New Hampshire}
-}
+%\affiliation{
+% \institution{University of New Hampshire}
+%  \city{Durham}
+% \state{New Hampshire}
+%}
+%\author{Laura Dietz}
+%\email{dietz@cs.unh.edu}
+%\affiliation{
+% \institution{University of New Hampshire}
+%  \city{Durham}
+% \state{New Hampshire}
+%}
 
 %
 % By default, the full list of authors will be used in the page headers. Often, this list is too long, and will overlap
 % other information printed in the page headers. This command allows the author to define a more concise list
 % of authors' names for this purpose.
-\renewcommand{\shortauthors}{Chatterjee et al.}
+%\renewcommand{\shortauthors}{Chatterjee et al.}
 
 %
 % The abstract is a short summary of the work to be presented in the article.
 \input{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10002951.10003317.10003338.10003340</concept_id>
+       <concept_desc>Information systems~Probabilistic retrieval models</concept_desc>
+       <concept_significance>100</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10002951.10003317.10003338.10003341</concept_id>
+       <concept_desc>Information systems~Language models</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10002951.10003317.10003338.10003342</concept_id>
+       <concept_desc>Information systems~Similarity measures</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[100]{Information systems~Probabilistic retrieval models}
+\ccsdesc[300]{Information systems~Language models}
+\ccsdesc[500]{Information systems~Similarity measures}
+
+
 % Keywords. The author(s) should pick words that accurately describe the work being presented. Separate the keywords with commas.
- %\keywords{entities, entity-aspects, wikification, entity salience, entity relatedness, co-occurring entities, neural networks, context models}
+\keywords{entities, entity-aspects, wikification, entity salience, entity relatedness, co-occurring entities}
 
 % This command processes the author and affiliation and title information and builds
 % the first part of the formatted document.
